@@ -1,0 +1,7 @@
+node_modules
+dist
+.frontify
+.idea
+.vscode
+.env
+.env.local
