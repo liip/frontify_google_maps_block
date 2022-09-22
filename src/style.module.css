@@ -4,13 +4,25 @@
     display: flex;
     color: black;
     min-height: 100px;
-    padding: 0 0 0 16px;
     display: flex;
+    justify-content: space-between;
 }
 
-.mapContainer {
-    width: 60%;
+.containerMap {
+    width: 100%;
     height: 500px;
+}
+
+.containerInputs {
+    padding-left: 20px;
+}
+
+.containerInputLongitude {
+    padding-top: 20px;
+}
+
+.containerBtnSubmit {
+    padding-top: 20px;
 }
 
 .input {
