@@ -1,4 +1,32 @@
-.mapContainer {
+/* (c) Copyright Frontify Ltd., all rights reserved. */
+
+.container {
+    display: flex;
+    color: black;
+    min-height: 100px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.containerMap {
+    width: 100%;
+    height: 500px;
+}
+
+.containerInputs {
+    padding-left: 20px;
+}
+
+.containerInputLongitude {
+    padding-top: 20px;
+}
+
+.containerBtnSubmit {
+    padding-top: 20px;
+}
+
+.input {
+    padding: 10px;
     width: 100%;
     height: 500px;
 }
