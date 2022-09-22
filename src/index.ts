@@ -1,9 +1,7 @@
-/* (c) Copyright Frontify Ltd., all rights reserved. */
-
-import { AnExampleBlock } from './Block';
+import { GoogleMapsBlock } from './GoogleMapsBlock';
 import { settings } from './settings';
 
 export default {
-    block: AnExampleBlock,
+    block: GoogleMapsBlock,
     settings,
 };
