@@ -1,10 +1,13 @@
 import { AppBridgeBlock, useBlockSettings } from '@frontify/app-bridge';
-import { FC } from 'react';
+import React, { FC } from 'react';
 import { Map } from './Map';
 import { EmptyState } from './EmtpyState';
 
-type Settings = {
+export type Settings = {
     apiKey: string;
+    customMapFormat: boolean;
+    formatPreset: string;
+    fixedHeight: string;
 };
 
 type Props = {
@@ -18,5 +21,5 @@ export const GoogleMapsBlock: FC<Props> = ({ appBridge }) => {
         return <EmptyState />;
     }
 
-    return <Map apiKey={blockSettings.apiKey} />;
+    return <Map settings={blockSettings} />;
 };
