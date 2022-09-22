@@ -2,21 +2,22 @@ import { AppBridgeBlock, useBlockSettings } from '@frontify/app-bridge';
 import { FC } from 'react';
 import { Map } from './Map';
 import { EmptyState } from './EmtpyState';
-
-type Settings = {
-    apiKey: string;
-};
+import { Marker, Settings } from './types';
 
 type Props = {
     appBridge: AppBridgeBlock;
 };
 
 export const GoogleMapsBlock: FC<Props> = ({ appBridge }) => {
-    const [blockSettings] = useBlockSettings<Settings>(appBridge);
+    const [blockSettings, setBlockSettings] = useBlockSettings<Settings>(appBridge);
 
     if (!blockSettings.apiKey) {
         return <EmptyState />;
     }
 
-    return <Map apiKey={blockSettings.apiKey} />;
+    const setMarkers = (markers: Marker[]) => {
+        setBlockSettings({ markers });
+    };
+
+    return <Map apiKey={blockSettings.apiKey} markers={blockSettings.markers || []} setMarkers={setMarkers} />;
 };
