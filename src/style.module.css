@@ -9,12 +9,12 @@
         padding-bottom: calc((100% / 16) * 9);
     }
 
-    .mapContainerOuter16to9 {
+    .mapContainerOuter4to3 {
         padding-bottom: calc((100% / 4) * 3);
     }
 
     .mapContainerOuter1to1 {
-        padding-bottom: calc((100% / 4) * 3);
+        padding-bottom: 100%;
     }
 }
 
