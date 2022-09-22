@@ -1,20 +1,4 @@
-/* (c) Copyright Frontify Ltd., all rights reserved. */
-
-.container {
-    display: flex;
-    color: black;
-    min-height: 100px;
-    padding: 0 0 0 16px;
-    display: flex;
-}
-
 .mapContainer {
-    width: 60%;
-    height: 500px;
-}
-
-.input {
-    padding: 10px;
     width: 100%;
-    background-color: antiquewhite;
+    height: 500px;
 }
