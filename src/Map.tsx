@@ -26,6 +26,22 @@ export const Map: FC<Props> = ({ apiKey }) => {
     const [centerGoogleMap, setCenterGoogleMap] = useState({ lat: 47.394144, lng: 0.68484 });
     const [disabled, setDisabled] = useState(true);
 
+    const [bounds, setBounds] = useState([{ lat: latitude, lng: longitude }]);
+
+    // TODO
+    // Clean input on submit
+    // Value must be between .... and ....
+    // Allowed negative value
+
+    const handleBoundsMarkers = (newMarkers: any) => {
+        // google is not defined ?
+        // When I click on onSubmit to add a marker
+        // I want to add this marker into a new array
+        // let bounds = new google.maps.LatLng(latitude, longitude);
+        setBounds([...bounds, newMarkers]);
+        console.log('bounds', bounds);
+    };
+
     const handleLatitude = (latitude: string): void => {
         setLatitude(Number(latitude));
         handleDisabled();
@@ -37,10 +53,13 @@ export const Map: FC<Props> = ({ apiKey }) => {
     };
 
     const handleSubmit = (location: any) => {
+        // Refactoring
+        // location object --> target property
         location.preventDefault();
         setLatitude(Number(location.target[1].value));
         setLongitude(Number(location.target[3].value));
         setCenterGoogleMap({ lat: latitude, lng: longitude });
+        handleBoundsMarkers({ lat: latitude, lng: longitude });
     };
 
     const handleDisabled = (): void => {
