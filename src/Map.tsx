@@ -1,10 +1,12 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import style from './style.module.css';
-import { GoogleMap, useLoadScript } from '@react-google-maps/api';
+import { Autocomplete, GoogleMap, useLoadScript } from '@react-google-maps/api';
 import { Settings } from './GoogleMapsBlock';
+import { FormControl, TextInput } from '@frontify/fondue';
 
 type Props = {
     settings: Settings;
+    isEditing: boolean;
 };
 
 const mapClassNames: Record<string, Record<string, string>> = {
@@ -22,10 +24,33 @@ const mapClassNames: Record<string, Record<string, string>> = {
     },
 };
 
-export const Map: FC<Props> = ({ settings }) => {
+type AutocompleteInstance = google.maps.places.Autocomplete;
+
+type LibraryConfig = ('places' | 'drawing' | 'geometry' | 'localContext' | 'visualization')[];
+
+const libraries: LibraryConfig = ['places'];
+
+export const Map: FC<Props> = ({ isEditing, settings }) => {
     const { isLoaded } = useLoadScript({
         googleMapsApiKey: settings.apiKey,
+        libraries,
     });
+    const [term, setTerm] = useState('');
+    const [autocomplete, setAutocomplete] = useState<AutocompleteInstance>();
+
+    function onLoad(autocomplete: AutocompleteInstance) {
+        if (autocomplete) {
+            setAutocomplete(autocomplete);
+        }
+    }
+
+    function onPlaceChanged() {
+        if (autocomplete?.getPlace().name) {
+            setTerm(autocomplete.getPlace().name || '');
+        } else {
+            console.log('Autocomplete is not loaded yet!');
+        }
+    }
 
     if (!isLoaded) {
         return <div>Loading....</div>;
@@ -49,6 +74,13 @@ export const Map: FC<Props> = ({ settings }) => {
                         : style.mapContainerCustom
                 }
             ></GoogleMap>
+            {isEditing && (
+                <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
+                    <FormControl label={{ children: 'Places Autocomplete Baby', htmlFor: 'placesExample' }}>
+                        <TextInput value={term} onChange={(v) => setTerm(v)} />
+                    </FormControl>
+                </Autocomplete>
+            )}
         </div>
     );
 };
