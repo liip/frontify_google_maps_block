@@ -107,7 +107,6 @@ export const MarkerInput: FC<Props> = ({ marker, index, setMarker, isLoaded }) =
                             required={true}
                             onChange={(newAddress) => {
                                 setLocation({ address: newAddress });
-                                debouncedSetMarker({ ...marker, location: { address: newAddress } }, index);
                             }}
                         />
                     </FormControl>
