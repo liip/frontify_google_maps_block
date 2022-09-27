@@ -19,5 +19,11 @@ export const GoogleMapsBlock: FC<Props> = ({ appBridge }) => {
         setBlockSettings({ markers });
     };
 
-    return <Map apiKey={blockSettings.apiKey} markers={blockSettings.markers || []} setMarkers={setMarkers} />;
+    return (
+        <Map
+            apiKey={blockSettings.apiKey}
+            markers={blockSettings.markers || [{ location: { address: '', lat: 0, lng: 0 }, label: '' }]}
+            setMarkers={setMarkers}
+        />
+    );
 };

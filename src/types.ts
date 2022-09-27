@@ -1,7 +1,12 @@
+export type Location = {
+    address: string;
+    lat?: number;
+    lng?: number;
+};
+
 export type Marker = {
     label: string;
-    lat: string;
-    lng: string;
+    location: Location;
 };
 
 export type Settings = {

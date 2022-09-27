@@ -10,11 +10,16 @@ type Props = {
     setMarkers: (markers: MarkerType[]) => void;
 };
 
+type LibraryConfig = ('places' | 'drawing' | 'geometry' | 'localContext' | 'visualization')[];
+
+const libraries: LibraryConfig = ['places'];
+
 export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers }) => {
     const initialMapCenter = { lat: 47.394144, lng: 0.68484 };
 
     const { isLoaded } = useLoadScript({
         googleMapsApiKey: apiKey,
+        libraries,
     });
 
     if (!isLoaded) {
@@ -31,11 +36,18 @@ export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers }) => {
         <div>
             <GoogleMap zoom={10} center={initialMapCenter} mapContainerClassName={style.containerMap}>
                 {markers.map((marker, index) => {
-                    return <Marker key={index} position={{ lat: Number(marker.lat), lng: Number(marker.lng) }} />;
+                    return (
+                        <Marker
+                            key={index}
+                            position={{ lat: Number(marker.location.lat), lng: Number(marker.location.lng) }}
+                        />
+                    );
                 })}
             </GoogleMap>
             {markers.map((marker, index) => {
-                return <MarkerInput key={index} marker={marker} index={index} setMarker={setMarker} />;
+                return (
+                    <MarkerInput key={index} marker={marker} index={index} setMarker={setMarker} isLoaded={isLoaded} />
+                );
             })}
         </div>
     );
