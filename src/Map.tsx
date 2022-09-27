@@ -3,6 +3,7 @@ import style from './style.module.css';
 import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
 import { Marker as MarkerType } from './types';
 import { MarkerInput } from './MarkerInput';
+import { Button, ButtonRounding, ButtonStyle, ButtonType, Stack } from '@frontify/fondue';
 
 type Props = {
     apiKey: string;
@@ -32,6 +33,10 @@ export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers }) => {
         setMarkers(newMarkers);
     };
 
+    const deleteMarker = (marker: MarkerType, index: number) => {
+        setMarkers(markers.filter((marker) => marker !== markers[index]));
+    };
+
     return (
         <div>
             <GoogleMap zoom={10} center={initialMapCenter} mapContainerClassName={style.containerMap}>
@@ -46,9 +51,27 @@ export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers }) => {
             </GoogleMap>
             {markers.map((marker, index) => {
                 return (
-                    <MarkerInput key={index} marker={marker} index={index} setMarker={setMarker} isLoaded={isLoaded} />
+                    <Stack spacing={'s'} padding={'s'} align={'center'} key={marker.location.address}>
+                        <MarkerInput marker={marker} index={index} setMarker={setMarker} isLoaded={isLoaded} />
+                        <Button
+                            type={ButtonType.Button}
+                            onClick={() => deleteMarker(marker, index)}
+                            rounding={ButtonRounding.Medium}
+                            style={ButtonStyle.Secondary}
+                        >
+                            Delete Marker {index}
+                        </Button>
+                    </Stack>
                 );
             })}
+            <Button
+                type={ButtonType.Button}
+                onClick={() => setMarker({ location: { address: '', lat: 0, lng: 0 }, label: '' }, markers?.length)}
+                rounding={ButtonRounding.Medium}
+                style={ButtonStyle.Secondary}
+            >
+                Add new Location Marker
+            </Button>
         </div>
     );
 };
