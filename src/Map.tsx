@@ -3,7 +3,7 @@ import style from './style.module.css';
 import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
 import { Marker as MarkerType } from './types';
 import { MarkerInput } from './MarkerInput';
-import { Button, ButtonRounding, ButtonStyle, ButtonType, Stack } from '@frontify/fondue';
+import { Button, ButtonRounding, ButtonStyle, ButtonType, IconPlus, IconTrashBin, Stack } from '@frontify/fondue';
 
 type Props = {
     apiKey: string;
@@ -51,27 +51,29 @@ export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers }) => {
             </GoogleMap>
             {markers.map((marker, index) => {
                 return (
-                    <Stack spacing={'s'} padding={'s'} align={'center'} key={marker.location.address}>
+                    <Stack spacing={'s'} padding={'xs'} align={'end'} key={marker.location.address}>
                         <MarkerInput marker={marker} index={index} setMarker={setMarker} isLoaded={isLoaded} />
                         <Button
                             type={ButtonType.Button}
                             onClick={() => deleteMarker(marker, index)}
                             rounding={ButtonRounding.Medium}
+                            icon={<IconTrashBin />}
                             style={ButtonStyle.Secondary}
-                        >
-                            Delete Marker {index}
-                        </Button>
+                        />
                     </Stack>
                 );
             })}
-            <Button
-                type={ButtonType.Button}
-                onClick={() => setMarker({ location: { address: '', lat: 0, lng: 0 }, label: '' }, markers?.length)}
-                rounding={ButtonRounding.Medium}
-                style={ButtonStyle.Secondary}
-            >
-                Add new Location Marker
-            </Button>
+            <Stack spacing={'s'} padding={'xs'}>
+                <Button
+                    type={ButtonType.Button}
+                    onClick={() => setMarker({ location: { address: '', lat: 0, lng: 0 }, label: '' }, markers?.length)}
+                    rounding={ButtonRounding.Medium}
+                    icon={<IconPlus />}
+                    style={ButtonStyle.Secondary}
+                >
+                    Add new Location Marker
+                </Button>
+            </Stack>
         </div>
     );
 };

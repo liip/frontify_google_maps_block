@@ -1,4 +1,4 @@
-import React, { FC, Fragment, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { Autocomplete } from '@react-google-maps/api';
 import {
     FormControl,
@@ -66,8 +66,8 @@ export const MarkerInput: FC<Props> = ({ marker, index, setMarker, isLoaded }) =
     }
 
     return (
-        <Fragment key={index}>
-            <Stack padding={'s'} spacing={'m'}>
+        <div key={index} className={'tw-w-full'}>
+            <Stack padding={'none'} spacing={'s'}>
                 <FormControl
                     clickable
                     direction={FormControlDirection.Vertical}
@@ -113,6 +113,6 @@ export const MarkerInput: FC<Props> = ({ marker, index, setMarker, isLoaded }) =
                     </FormControl>
                 </Autocomplete>
             </Stack>
-        </Fragment>
+        </div>
     );
 };
