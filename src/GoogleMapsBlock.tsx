@@ -26,6 +26,7 @@ export const GoogleMapsBlock: FC<Props> = ({ appBridge }) => {
             markers={blockSettings.markers || [{ location: { address: '', lat: 0, lng: 0 }, label: '' }]}
             setMarkers={setMarkers}
             isEditing={isEditing}
+            showLabels={blockSettings.showLabels}
         />
     );
 };

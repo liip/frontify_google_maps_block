@@ -1,6 +1,6 @@
 import React, { FC, Fragment, useCallback, useEffect, useState } from 'react';
 import style from './style.module.css';
-import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
+import { GoogleMap, InfoWindow, Marker, useLoadScript } from '@react-google-maps/api';
 import { Marker as MarkerType } from './types';
 import { MarkerInput } from './MarkerInput';
 import { Button, ButtonRounding, ButtonStyle, ButtonType, IconPlus, IconTrashBin, Stack } from '@frontify/fondue';
@@ -10,6 +10,7 @@ type Props = {
     markers?: MarkerType[];
     setMarkers: (markers: MarkerType[]) => void;
     isEditing: boolean;
+    showLabels: boolean;
 };
 
 type MapType = google.maps.Map;
@@ -18,7 +19,7 @@ type LibraryConfig = ('places' | 'drawing' | 'geometry' | 'localContext' | 'visu
 
 const libraries: LibraryConfig = ['places'];
 
-export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers, isEditing }) => {
+export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers, isEditing, showLabels }) => {
     const initialMapCenter = { lat: 47.394144, lng: 0.68484 };
 
     const [map, setMap] = useState<MapType>();
@@ -32,20 +33,15 @@ export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers, isEditing }) 
 
     useEffect(() => {
         if (map) {
-            const bounds = new window.google.maps.LatLngBounds();
-            markers.map((marker) => {
-                bounds.extend({
-                    lat: Number(marker.location.lat),
-                    lng: Number(marker.location.lng),
-                });
-                return map.fitBounds(bounds);
-            });
+            map.fitBounds(bounds);
         }
-    }, [map, markers, isEditing]);
+    }, [map, markers, isEditing, showLabels]);
 
     if (!isLoaded) {
         return <div>Loading....</div>;
     }
+
+    const bounds = new window.google.maps.LatLngBounds();
 
     const setMarker = (marker: MarkerType, index: number) => {
         const newMarkers = [...markers];
@@ -57,17 +53,36 @@ export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers, isEditing }) 
         setMarkers(markers.filter((marker) => marker !== markers[index]));
     };
 
+    const labelStyles = {
+        color: 'black',
+        padding: '0 8px',
+    };
+
     return (
         <div>
             <GoogleMap zoom={10} center={initialMapCenter} mapContainerClassName={style.containerMap} onLoad={onLoad}>
-                {markers.map((marker, index) => {
-                    return (
-                        <Marker
-                            key={index}
-                            position={{ lat: Number(marker.location.lat), lng: Number(marker.location.lng) }}
-                        />
-                    );
-                })}
+                {markers
+                    ? markers.map((marker, index) => {
+                          bounds.extend({
+                              lat: Number(marker.location.lat),
+                              lng: Number(marker.location.lng),
+                          });
+                          return (
+                              <Marker
+                                  key={index}
+                                  position={{ lat: Number(marker.location.lat), lng: Number(marker.location.lng) }}
+                              >
+                                  {showLabels && (
+                                      <InfoWindow options={{ maxWidth: 200 }}>
+                                          <div style={labelStyles}>
+                                              <h1>{marker.label}</h1>
+                                          </div>
+                                      </InfoWindow>
+                                  )}
+                              </Marker>
+                          );
+                      })
+                    : ''}
             </GoogleMap>
             {isEditing && (
                 <Fragment>

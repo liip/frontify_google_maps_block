@@ -12,4 +12,5 @@ export type Marker = {
 export type Settings = {
     apiKey: string;
     markers?: Marker[];
+    showLabels: boolean;
 };
