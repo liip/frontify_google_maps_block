@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import style from './style.module.css';
 import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
 import { Marker as MarkerType } from './types';
@@ -11,6 +11,8 @@ type Props = {
     setMarkers: (markers: MarkerType[]) => void;
 };
 
+type MapType = google.maps.Map;
+
 type LibraryConfig = ('places' | 'drawing' | 'geometry' | 'localContext' | 'visualization')[];
 
 const libraries: LibraryConfig = ['places'];
@@ -18,10 +20,27 @@ const libraries: LibraryConfig = ['places'];
 export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers }) => {
     const initialMapCenter = { lat: 47.394144, lng: 0.68484 };
 
+    const [map, setMap] = useState<MapType>();
+
     const { isLoaded } = useLoadScript({
         googleMapsApiKey: apiKey,
         libraries,
     });
+
+    const onLoad = useCallback((map) => setMap(map), []);
+
+    useEffect(() => {
+        if (map) {
+            const bounds = new window.google.maps.LatLngBounds();
+            markers.map((marker) => {
+                bounds.extend({
+                    lat: Number(marker.location.lat),
+                    lng: Number(marker.location.lng),
+                });
+                return map.fitBounds(bounds);
+            });
+        }
+    }, [map, markers]);
 
     if (!isLoaded) {
         return <div>Loading....</div>;
@@ -39,7 +58,7 @@ export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers }) => {
 
     return (
         <div>
-            <GoogleMap zoom={10} center={initialMapCenter} mapContainerClassName={style.containerMap}>
+            <GoogleMap zoom={10} center={initialMapCenter} mapContainerClassName={style.containerMap} onLoad={onLoad}>
                 {markers.map((marker, index) => {
                     return (
                         <Marker
