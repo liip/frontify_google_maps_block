@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { FC, Fragment, useCallback, useEffect, useState } from 'react';
 import style from './style.module.css';
 import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
 import { Marker as MarkerType } from './types';
@@ -9,6 +9,7 @@ type Props = {
     apiKey: string;
     markers?: MarkerType[];
     setMarkers: (markers: MarkerType[]) => void;
+    isEditing: boolean;
 };
 
 type MapType = google.maps.Map;
@@ -17,7 +18,7 @@ type LibraryConfig = ('places' | 'drawing' | 'geometry' | 'localContext' | 'visu
 
 const libraries: LibraryConfig = ['places'];
 
-export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers }) => {
+export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers, isEditing }) => {
     const initialMapCenter = { lat: 47.394144, lng: 0.68484 };
 
     const [map, setMap] = useState<MapType>();
@@ -40,7 +41,7 @@ export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers }) => {
                 return map.fitBounds(bounds);
             });
         }
-    }, [map, markers]);
+    }, [map, markers, isEditing]);
 
     if (!isLoaded) {
         return <div>Loading....</div>;
@@ -68,31 +69,37 @@ export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers }) => {
                     );
                 })}
             </GoogleMap>
-            {markers.map((marker, index) => {
-                return (
-                    <Stack spacing={'s'} padding={'xs'} align={'end'} key={marker.location.address}>
-                        <MarkerInput marker={marker} index={index} setMarker={setMarker} isLoaded={isLoaded} />
+            {isEditing && (
+                <Fragment>
+                    {markers.map((marker, index) => {
+                        return (
+                            <Stack spacing={'s'} padding={'xs'} align={'end'} key={marker.location.address}>
+                                <MarkerInput marker={marker} index={index} setMarker={setMarker} isLoaded={isLoaded} />
+                                <Button
+                                    type={ButtonType.Button}
+                                    onClick={() => deleteMarker(marker, index)}
+                                    rounding={ButtonRounding.Medium}
+                                    icon={<IconTrashBin />}
+                                    style={ButtonStyle.Secondary}
+                                />
+                            </Stack>
+                        );
+                    })}
+                    <Stack spacing={'s'} padding={'xs'}>
                         <Button
                             type={ButtonType.Button}
-                            onClick={() => deleteMarker(marker, index)}
+                            onClick={() =>
+                                setMarker({ location: { address: '', lat: 0, lng: 0 }, label: '' }, markers?.length)
+                            }
                             rounding={ButtonRounding.Medium}
-                            icon={<IconTrashBin />}
+                            icon={<IconPlus />}
                             style={ButtonStyle.Secondary}
-                        />
+                        >
+                            Add new Location Marker
+                        </Button>
                     </Stack>
-                );
-            })}
-            <Stack spacing={'s'} padding={'xs'}>
-                <Button
-                    type={ButtonType.Button}
-                    onClick={() => setMarker({ location: { address: '', lat: 0, lng: 0 }, label: '' }, markers?.length)}
-                    rounding={ButtonRounding.Medium}
-                    icon={<IconPlus />}
-                    style={ButtonStyle.Secondary}
-                >
-                    Add new Location Marker
-                </Button>
-            </Stack>
+                </Fragment>
+            )}
         </div>
     );
 };
