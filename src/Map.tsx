@@ -52,6 +52,8 @@ export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers, isEditing, sh
         setMarkers(markers.filter((marker) => marker !== markers[index]));
     };
 
+    const getMarkerKey = (marker: MarkerType, index: number) => `${marker.location?.placeId || 'newPlace'}-${index}`;
+
     return (
         <div>
             <GoogleMap
@@ -71,7 +73,7 @@ export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers, isEditing, sh
                               });
                               return (
                                   <Marker
-                                      key={`${marker.location.placeId}-${index}`}
+                                      key={getMarkerKey(marker, index)}
                                       position={{
                                           lat: Number(marker.location.lat),
                                           lng: Number(marker.location.lng),
@@ -93,12 +95,7 @@ export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers, isEditing, sh
                 <Fragment>
                     {markers.map((marker, index) => {
                         return (
-                            <Stack
-                                spacing={'s'}
-                                padding={'xs'}
-                                align={'end'}
-                                key={`${marker.location?.placeId || 'newPlace'}-${index}`}
-                            >
+                            <Stack spacing={'s'} padding={'xs'} align={'end'} key={getMarkerKey(marker, index)}>
                                 <MarkerInput marker={marker} index={index} setMarker={setMarker} isLoaded={isLoaded} />
                                 <Button
                                     type={ButtonType.Button}
