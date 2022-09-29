@@ -10,6 +10,12 @@ export const settings: BlockSettings = {
             placeholder: 'Paste your API Key here',
             label: 'Google Maps API Key',
         },
+        {
+            id: 'showLabels',
+            type: 'switch',
+            defaultValue: false,
+            label: 'Show labels on map',
+        },
     ],
     [Sections.Layout]: [
         {
