@@ -9,7 +9,7 @@ import {
     TextInputType,
     debounce,
 } from '@frontify/fondue';
-import { Location, Marker } from './types';
+import { Marker } from './types';
 
 type Props = {
     isLoaded: boolean;
@@ -23,7 +23,7 @@ type AutocompleteInstance = google.maps.places.Autocomplete;
 export const MarkerInput: FC<Props> = ({ marker, index, setMarker, isLoaded }) => {
     const locationId = `location-${index}`;
     const labelId = `label-${index}`;
-    const [location, setLocation] = useState<Location>(marker.location);
+    const [address, setAddress] = useState<string>(marker.location?.address || '');
     const [label, setLabel] = useState<string>(marker.label);
 
     const debouncedSetMarker = React.useMemo(
@@ -43,15 +43,17 @@ export const MarkerInput: FC<Props> = ({ marker, index, setMarker, isLoaded }) =
     }
 
     function onPlaceChanged() {
-        if (autocomplete?.getPlace().name) {
-            setLocation({ address: autocomplete.getPlace().name || '' });
+        const place = autocomplete?.getPlace();
+        if (place?.name) {
+            setAddress(place.name);
             debouncedSetMarker(
                 {
                     ...marker,
                     location: {
-                        address: autocomplete.getPlace().name || '',
-                        lat: autocomplete?.getPlace().geometry?.location?.lat(),
-                        lng: autocomplete?.getPlace().geometry?.location?.lng(),
+                        address: place.name || '',
+                        placeId: place.place_id,
+                        lat: place.geometry?.location?.lat(),
+                        lng: place.geometry?.location?.lng(),
                     },
                 },
                 index
@@ -66,7 +68,7 @@ export const MarkerInput: FC<Props> = ({ marker, index, setMarker, isLoaded }) =
     }
 
     return (
-        <div key={index} className={'tw-w-full'}>
+        <div className={'tw-w-full'}>
             <Stack padding={'none'} spacing={'s'}>
                 <FormControl
                     clickable
@@ -74,7 +76,6 @@ export const MarkerInput: FC<Props> = ({ marker, index, setMarker, isLoaded }) =
                     label={{
                         children: 'Label',
                         htmlFor: labelId,
-                        required: true,
                     }}
                     style={FormControlStyle.Primary}
                 >
@@ -82,7 +83,6 @@ export const MarkerInput: FC<Props> = ({ marker, index, setMarker, isLoaded }) =
                         id={labelId}
                         value={label}
                         type={TextInputType.Text}
-                        required={true}
                         onChange={(newLabel) => {
                             setLabel(newLabel);
                             debouncedSetMarker({ ...marker, label: newLabel }, index);
@@ -102,11 +102,11 @@ export const MarkerInput: FC<Props> = ({ marker, index, setMarker, isLoaded }) =
                     >
                         <TextInput
                             id={locationId}
-                            value={location?.address || ''}
+                            value={address || ''}
                             type={TextInputType.Text}
                             required={true}
                             onChange={(newAddress) => {
-                                setLocation({ address: newAddress });
+                                setAddress(newAddress);
                             }}
                         />
                     </FormControl>
