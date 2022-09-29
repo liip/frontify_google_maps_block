@@ -62,26 +62,28 @@ export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers, isEditing, sh
         <div>
             <GoogleMap zoom={10} center={initialMapCenter} mapContainerClassName={style.containerMap} onLoad={onLoad}>
                 {markers
-                    ? markers.map((marker, index) => {
-                          bounds.extend({
-                              lat: Number(marker.location.lat),
-                              lng: Number(marker.location.lng),
-                          });
-                          return (
-                              <Marker
-                                  key={index}
-                                  position={{ lat: Number(marker.location.lat), lng: Number(marker.location.lng) }}
-                              >
-                                  {showLabels && (
-                                      <InfoWindow options={{ maxWidth: 200 }}>
-                                          <div style={labelStyles}>
-                                              <h1>{marker.label}</h1>
-                                          </div>
-                                      </InfoWindow>
-                                  )}
-                              </Marker>
-                          );
-                      })
+                    ? markers
+                          .filter((marker) => marker.location.lat && marker.location.lng)
+                          .map((marker, index) => {
+                              bounds.extend({
+                                  lat: Number(marker.location.lat),
+                                  lng: Number(marker.location.lng),
+                              });
+                              return (
+                                  <Marker
+                                      key={index}
+                                      position={{ lat: Number(marker.location.lat), lng: Number(marker.location.lng) }}
+                                  >
+                                      {showLabels && (
+                                          <InfoWindow options={{ maxWidth: 200 }}>
+                                              <div style={labelStyles}>
+                                                  <h1>{marker.label}</h1>
+                                              </div>
+                                          </InfoWindow>
+                                      )}
+                                  </Marker>
+                              );
+                          })
                     : ''}
             </GoogleMap>
             {isEditing && (
