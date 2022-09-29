@@ -25,6 +25,8 @@ export const MarkerInput: FC<Props> = ({ marker, index, setMarker, isLoaded }) =
     const labelId = `label-${index}`;
     const [address, setAddress] = useState<string>(marker.location?.address || '');
     const [label, setLabel] = useState<string>(marker.label);
+    const [addressInputStyle, setAddressInputStyle] = useState<FormControlStyle>(FormControlStyle.Primary);
+    const [addressInputHelperText, setAddressInputHelperText] = useState<string>('');
 
     const debouncedSetMarker = React.useMemo(
         () =>
@@ -36,16 +38,22 @@ export const MarkerInput: FC<Props> = ({ marker, index, setMarker, isLoaded }) =
 
     const [autocomplete, setAutocomplete] = useState<AutocompleteInstance>();
 
-    function onLoad(autocomplete: AutocompleteInstance) {
+    const onLoad = (autocomplete: AutocompleteInstance) => {
         if (autocomplete) {
             setAutocomplete(autocomplete);
         }
-    }
+    };
+
+    const resetAddressInput = () => {
+        setAddressInputHelperText('');
+        setAddressInputStyle(FormControlStyle.Primary);
+    };
 
     function onPlaceChanged() {
         const place = autocomplete?.getPlace();
         if (place?.name) {
             setAddress(place.name);
+            resetAddressInput();
             debouncedSetMarker(
                 {
                     ...marker,
@@ -70,6 +78,31 @@ export const MarkerInput: FC<Props> = ({ marker, index, setMarker, isLoaded }) =
     return (
         <div className={'tw-w-full'}>
             <Stack padding={'none'} spacing={'s'}>
+                <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged} className={'tw-w-full'}>
+                    <FormControl
+                        clickable
+                        direction={FormControlDirection.Vertical}
+                        label={{
+                            children: 'Location',
+                            htmlFor: locationId,
+                            required: true,
+                        }}
+                        helper={addressInputHelperText ? { text: addressInputHelperText } : undefined}
+                        style={addressInputStyle}
+                    >
+                        <TextInput
+                            id={locationId}
+                            value={address || ''}
+                            type={TextInputType.Text}
+                            required={true}
+                            onChange={(newAddress) => {
+                                setAddress(newAddress);
+                                setAddressInputHelperText('Please select a suggested place from the dropdown!');
+                                setAddressInputStyle(FormControlStyle.Danger);
+                            }}
+                        />
+                    </FormControl>
+                </Autocomplete>
                 <FormControl
                     clickable
                     direction={FormControlDirection.Vertical}
@@ -89,28 +122,6 @@ export const MarkerInput: FC<Props> = ({ marker, index, setMarker, isLoaded }) =
                         }}
                     />
                 </FormControl>
-                <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged} className={'tw-w-full'}>
-                    <FormControl
-                        clickable
-                        direction={FormControlDirection.Vertical}
-                        label={{
-                            children: 'Location',
-                            htmlFor: locationId,
-                            required: true,
-                        }}
-                        style={FormControlStyle.Primary}
-                    >
-                        <TextInput
-                            id={locationId}
-                            value={address || ''}
-                            type={TextInputType.Text}
-                            required={true}
-                            onChange={(newAddress) => {
-                                setAddress(newAddress);
-                            }}
-                        />
-                    </FormControl>
-                </Autocomplete>
             </Stack>
         </div>
     );
