@@ -3,15 +3,13 @@ import { GoogleMap, InfoWindow, Marker, useLoadScript } from '@react-google-maps
 import { Button, ButtonRounding, ButtonStyle, ButtonType, IconPlus, IconTrashBin, Stack } from '@frontify/fondue';
 import style from './style.module.css';
 import { MarkerInput } from './MarkerInput';
-import { Marker as MarkerType } from './types';
+import { Marker as MarkerType, Settings } from './types';
 import { INITIAL_MAP_CENTER, INITIAL_ZOOM } from './config';
 
 type Props = {
-    apiKey: string;
-    markers?: MarkerType[];
     setMarkers: (markers: MarkerType[]) => void;
     isEditing: boolean;
-    showLabels: boolean;
+    settings: Settings;
 };
 
 type MapType = google.maps.Map;
@@ -20,7 +18,23 @@ type LibraryConfig = ('places' | 'drawing' | 'geometry' | 'localContext' | 'visu
 
 const libraries: LibraryConfig = ['places'];
 
-export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers, isEditing, showLabels }) => {
+const mapClassNames: Record<string, Record<string, string>> = {
+    '16to9': {
+        inner: style.mapContainerInner16to9,
+        outer: style.mapContainerOuter16to9,
+    },
+    '4to3': {
+        inner: style.mapContainerInner4to3,
+        outer: style.mapContainerOuter4to3,
+    },
+    '1to1': {
+        inner: style.mapContainerInner1to1,
+        outer: style.mapContainerOuter1to1,
+    },
+};
+
+export const Map: FC<Props> = ({ setMarkers, isEditing, settings }) => {
+    const { markers = [], apiKey, customMapFormat, formatPreset, fixedHeight } = settings;
     const [map, setMap] = useState<MapType>();
 
     const { isLoaded } = useLoadScript({
@@ -56,41 +70,54 @@ export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers, isEditing, sh
 
     return (
         <div>
-            <GoogleMap
-                zoom={INITIAL_ZOOM}
-                center={INITIAL_MAP_CENTER}
-                mapContainerClassName={style.containerMap}
-                onLoad={onLoad}
+            <div
+                className={
+                    !customMapFormat
+                        ? [style.mapContainerOuter, mapClassNames[formatPreset].outer].join(' ')
+                        : undefined
+                }
+                style={customMapFormat ? { height: fixedHeight ? parseInt(fixedHeight) : 500 } : undefined}
             >
-                {markers
-                    ? markers
-                          // Do not render markers without location
-                          .filter((marker) => marker.location?.lat && marker.location?.lng)
-                          .map((marker, index) => {
-                              bounds.extend({
-                                  lat: Number(marker.location.lat),
-                                  lng: Number(marker.location.lng),
-                              });
-                              return (
-                                  <Marker
-                                      key={getMarkerKey(marker, index)}
-                                      position={{
-                                          lat: Number(marker.location.lat),
-                                          lng: Number(marker.location.lng),
-                                      }}
-                                  >
-                                      {/*{marker.label && (*/}
-                                      {/*    <InfoWindow options={{ maxWidth: 200 }}>*/}
-                                      {/*        <div className={style.infoWindow}>*/}
-                                      {/*            <h1>{marker.label}</h1>*/}
-                                      {/*        </div>*/}
-                                      {/*    </InfoWindow>*/}
-                                      {/*)}*/}
-                                  </Marker>
-                              );
-                          })
-                    : ''}
-            </GoogleMap>
+                <GoogleMap
+                    zoom={INITIAL_ZOOM}
+                    center={INITIAL_MAP_CENTER}
+                    mapContainerClassName={
+                        !customMapFormat
+                            ? [style.mapContainerInner, mapClassNames[formatPreset].inner].join(' ')
+                            : style.mapContainerCustom
+                    }
+                    onLoad={onLoad}
+                >
+                    {markers
+                        ? markers
+                              // Do not render markers without location
+                              .filter((marker) => marker.location?.lat && marker.location?.lng)
+                              .map((marker, index) => {
+                                  bounds.extend({
+                                      lat: Number(marker.location.lat),
+                                      lng: Number(marker.location.lng),
+                                  });
+                                  return (
+                                      <Marker
+                                          key={getMarkerKey(marker, index)}
+                                          position={{
+                                              lat: Number(marker.location.lat),
+                                              lng: Number(marker.location.lng),
+                                          }}
+                                      >
+                                          {/*{marker.label && (*/}
+                                          {/*    <InfoWindow options={{ maxWidth: 200 }}>*/}
+                                          {/*        <div className={style.infoWindow}>*/}
+                                          {/*            <h1>{marker.label}</h1>*/}
+                                          {/*        </div>*/}
+                                          {/*    </InfoWindow>*/}
+                                          {/*)}*/}
+                                      </Marker>
+                                  );
+                              })
+                        : ''}
+                </GoogleMap>
+            </div>
             {isEditing && (
                 <Fragment>
                     {markers.map((marker, index) => {

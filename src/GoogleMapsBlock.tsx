@@ -1,5 +1,5 @@
 import { AppBridgeBlock, useBlockSettings, useEditorState } from '@frontify/app-bridge';
-import { FC } from 'react';
+import React, { FC } from 'react';
 import { Map } from './Map';
 import { EmptyState } from './EmtpyState';
 import { Marker, Settings } from './types';
@@ -20,13 +20,5 @@ export const GoogleMapsBlock: FC<Props> = ({ appBridge }) => {
         setBlockSettings({ markers });
     };
 
-    return (
-        <Map
-            apiKey={blockSettings.apiKey}
-            markers={blockSettings.markers || []}
-            setMarkers={setMarkers}
-            isEditing={isEditing}
-            showLabels={blockSettings.showLabels}
-        />
-    );
+    return <Map setMarkers={setMarkers} isEditing={isEditing} settings={blockSettings} />;
 };
