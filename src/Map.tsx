@@ -1,9 +1,10 @@
 import React, { FC, Fragment, useCallback, useEffect, useState } from 'react';
-import style from './style.module.css';
 import { GoogleMap, InfoWindow, Marker, useLoadScript } from '@react-google-maps/api';
-import { Marker as MarkerType } from './types';
-import { MarkerInput } from './MarkerInput';
 import { Button, ButtonRounding, ButtonStyle, ButtonType, IconPlus, IconTrashBin, Stack } from '@frontify/fondue';
+import style from './style.module.css';
+import { MarkerInput } from './MarkerInput';
+import { Marker as MarkerType } from './types';
+import { INITIAL_MAP_CENTER, INITIAL_ZOOM } from './config';
 
 type Props = {
     apiKey: string;
@@ -20,8 +21,6 @@ type LibraryConfig = ('places' | 'drawing' | 'geometry' | 'localContext' | 'visu
 const libraries: LibraryConfig = ['places'];
 
 export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers, isEditing, showLabels }) => {
-    const initialMapCenter = { lat: 47.394144, lng: 0.68484 };
-
     const [map, setMap] = useState<MapType>();
 
     const { isLoaded } = useLoadScript({
@@ -32,10 +31,10 @@ export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers, isEditing, sh
     const onLoad = useCallback((map) => setMap(map), []);
 
     useEffect(() => {
-        if (map) {
+        if (map && bounds) {
             map.fitBounds(bounds);
         }
-    }, [map, markers, isEditing, showLabels]);
+    }, [map, markers]);
 
     if (!isLoaded) {
         return <div>Loading....</div>;
@@ -53,16 +52,17 @@ export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers, isEditing, sh
         setMarkers(markers.filter((marker) => marker !== markers[index]));
     };
 
-    const labelStyles = {
-        color: 'black',
-        padding: '0 8px',
-    };
-
     return (
         <div>
-            <GoogleMap zoom={10} center={initialMapCenter} mapContainerClassName={style.containerMap} onLoad={onLoad}>
+            <GoogleMap
+                zoom={INITIAL_ZOOM}
+                center={INITIAL_MAP_CENTER}
+                mapContainerClassName={style.containerMap}
+                onLoad={onLoad}
+            >
                 {markers
                     ? markers
+                          // Do not render markers without location
                           .filter((marker) => marker.location?.lat && marker.location?.lng)
                           .map((marker, index) => {
                               bounds.extend({
@@ -71,16 +71,19 @@ export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers, isEditing, sh
                               });
                               return (
                                   <Marker
-                                      key={index}
-                                      position={{ lat: Number(marker.location.lat), lng: Number(marker.location.lng) }}
+                                      key={`${marker.location.placeId}-${index}`}
+                                      position={{
+                                          lat: Number(marker.location.lat),
+                                          lng: Number(marker.location.lng),
+                                      }}
                                   >
-                                      {showLabels && (
-                                          <InfoWindow options={{ maxWidth: 200 }}>
-                                              <div style={labelStyles}>
-                                                  <h1>{marker.label}</h1>
-                                              </div>
-                                          </InfoWindow>
-                                      )}
+                                      {/*{marker.label && (*/}
+                                      {/*    <InfoWindow options={{ maxWidth: 200 }}>*/}
+                                      {/*        <div className={style.infoWindow}>*/}
+                                      {/*            <h1>{marker.label}</h1>*/}
+                                      {/*        </div>*/}
+                                      {/*    </InfoWindow>*/}
+                                      {/*)}*/}
                                   </Marker>
                               );
                           })
@@ -90,7 +93,12 @@ export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers, isEditing, sh
                 <Fragment>
                     {markers.map((marker, index) => {
                         return (
-                            <Stack spacing={'s'} padding={'xs'} align={'end'} key={index}>
+                            <Stack
+                                spacing={'s'}
+                                padding={'xs'}
+                                align={'end'}
+                                key={`${marker.location?.placeId || 'newPlace'}-${index}`}
+                            >
                                 <MarkerInput marker={marker} index={index} setMarker={setMarker} isLoaded={isLoaded} />
                                 <Button
                                     type={ButtonType.Button}
@@ -105,9 +113,7 @@ export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers, isEditing, sh
                     <Stack spacing={'s'} padding={'xs'}>
                         <Button
                             type={ButtonType.Button}
-                            onClick={() =>
-                                setMarker({ location: { address: '', lat: 0, lng: 0 }, label: '' }, markers?.length)
-                            }
+                            onClick={() => setMarker({ label: '' }, markers?.length)}
                             rounding={ButtonRounding.Medium}
                             icon={<IconPlus />}
                             style={ButtonStyle.Secondary}
