@@ -1,6 +1,15 @@
 import React, { FC, Fragment, useCallback, useEffect, useState } from 'react';
 import { GoogleMap, InfoWindow, Marker, useLoadScript } from '@react-google-maps/api';
-import { Button, ButtonRounding, ButtonStyle, ButtonType, IconPlus, IconTrashBin, Stack } from '@frontify/fondue';
+import {
+    Button,
+    ButtonRounding,
+    ButtonStyle,
+    ButtonType,
+    IconFocalPoint,
+    IconPlus,
+    IconTrashBin,
+    Stack,
+} from '@frontify/fondue';
 import style from './style.module.css';
 import { MarkerInput } from './MarkerInput';
 import { Marker as MarkerType, Settings } from './types';
@@ -44,11 +53,15 @@ export const Map: FC<Props> = ({ setMarkers, isEditing, settings }) => {
 
     const onLoad = useCallback((map) => setMap(map), []);
 
-    useEffect(() => {
+    const resetZoom = () => {
         if (map && bounds) {
             map.fitBounds(bounds);
         }
-    }, [map, markers]);
+    };
+
+    useEffect(() => {
+        resetZoom();
+    }, [map, markers, customMapFormat, formatPreset, fixedHeight]);
 
     if (!isLoaded) {
         return <div>Loading....</div>;
@@ -120,6 +133,17 @@ export const Map: FC<Props> = ({ setMarkers, isEditing, settings }) => {
             </div>
             {isEditing && (
                 <Fragment>
+                    <Stack spacing={'s'} padding={'xs'}>
+                        <Button
+                            type={ButtonType.Button}
+                            onClick={resetZoom}
+                            rounding={ButtonRounding.Medium}
+                            icon={<IconFocalPoint />}
+                            style={ButtonStyle.Secondary}
+                        >
+                            Reset Zoom
+                        </Button>
+                    </Stack>
                     {markers.map((marker, index) => {
                         return (
                             <Stack spacing={'s'} padding={'xs'} align={'end'} key={getMarkerKey(marker, index)}>
