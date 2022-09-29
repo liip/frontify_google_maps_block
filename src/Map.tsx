@@ -63,7 +63,7 @@ export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers, isEditing, sh
             <GoogleMap zoom={10} center={initialMapCenter} mapContainerClassName={style.containerMap} onLoad={onLoad}>
                 {markers
                     ? markers
-                          .filter((marker) => marker.location.lat && marker.location.lng)
+                          .filter((marker) => marker.location?.lat && marker.location?.lng)
                           .map((marker, index) => {
                               bounds.extend({
                                   lat: Number(marker.location.lat),
@@ -90,7 +90,7 @@ export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers, isEditing, sh
                 <Fragment>
                     {markers.map((marker, index) => {
                         return (
-                            <Stack spacing={'s'} padding={'xs'} align={'end'} key={marker.location.address}>
+                            <Stack spacing={'s'} padding={'xs'} align={'end'} key={index}>
                                 <MarkerInput marker={marker} index={index} setMarker={setMarker} isLoaded={isLoaded} />
                                 <Button
                                     type={ButtonType.Button}

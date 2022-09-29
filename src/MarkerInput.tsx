@@ -102,7 +102,7 @@ export const MarkerInput: FC<Props> = ({ marker, index, setMarker, isLoaded }) =
                     >
                         <TextInput
                             id={locationId}
-                            value={location.address}
+                            value={location?.address || ''}
                             type={TextInputType.Text}
                             required={true}
                             onChange={(newAddress) => {
