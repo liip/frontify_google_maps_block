@@ -10,7 +10,7 @@ type Props = {
     markers?: MarkerType[];
     setMarkers: (markers: MarkerType[]) => void;
     isEditing: boolean;
-    showLabels: boolean;
+    showLabelsByDefault: boolean;
 };
 
 type MapType = google.maps.Map;
@@ -19,7 +19,7 @@ type LibraryConfig = ('places' | 'drawing' | 'geometry' | 'localContext' | 'visu
 
 const libraries: LibraryConfig = ['places'];
 
-export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers, isEditing, showLabels }) => {
+export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers, isEditing, showLabelsByDefault }) => {
     const initialMapCenter = { lat: 47.394144, lng: 0.68484 };
 
     const [map, setMap] = useState<MapType>();
@@ -29,13 +29,22 @@ export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers, isEditing, sh
         libraries,
     });
 
+    const [showLabels, setShowLabels] = useState(showLabelsByDefault);
+    const showLabelsMarkers = (e: any) => {
+        // When I click on a marker, it shows or hide every labels
+        // I want to show or hide only the marker's label from which I click
+        setShowLabels(!showLabels);
+        console.log('e', e);
+        console.log('showLabels', showLabels);
+    };
+
     const onLoad = useCallback((map) => setMap(map), []);
 
     useEffect(() => {
         if (map) {
             map.fitBounds(bounds);
         }
-    }, [map, markers, isEditing, showLabels]);
+    }, [map, markers, isEditing, showLabelsByDefault]);
 
     if (!isLoaded) {
         return <div>Loading....</div>;
@@ -47,6 +56,7 @@ export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers, isEditing, sh
         const newMarkers = [...markers];
         newMarkers[index] = marker;
         setMarkers(newMarkers);
+        console.log('newMarkers', newMarkers);
     };
 
     const deleteMarker = (marker: MarkerType, index: number) => {
@@ -73,6 +83,7 @@ export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers, isEditing, sh
                                   <Marker
                                       key={index}
                                       position={{ lat: Number(marker.location.lat), lng: Number(marker.location.lng) }}
+                                      onClick={(e) => showLabelsMarkers(e)}
                                   >
                                       {showLabels && (
                                           <InfoWindow options={{ maxWidth: 200 }}>

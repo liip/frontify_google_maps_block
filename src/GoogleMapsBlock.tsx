@@ -11,6 +11,7 @@ type Props = {
 export const GoogleMapsBlock: FC<Props> = ({ appBridge }) => {
     const isEditing = useEditorState(appBridge);
     const [blockSettings, setBlockSettings] = useBlockSettings<Settings>(appBridge);
+    console.log(blockSettings);
 
     if (!blockSettings.apiKey) {
         return <EmptyState />;
@@ -26,7 +27,7 @@ export const GoogleMapsBlock: FC<Props> = ({ appBridge }) => {
             markers={blockSettings.markers || [{ location: { address: '', lat: 0, lng: 0 }, label: '' }]}
             setMarkers={setMarkers}
             isEditing={isEditing}
-            showLabels={blockSettings.showLabels}
+            showLabelsByDefault={blockSettings.showLabels}
         />
     );
 };
