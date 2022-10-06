@@ -56,7 +56,6 @@ export const Map: FC<Props> = ({ apiKey, markers = [], setMarkers, isEditing, sh
         const newMarkers = [...markers];
         newMarkers[index] = marker;
         setMarkers(newMarkers);
-        console.log('newMarkers', newMarkers);
     };
 
     const deleteMarker = (marker: MarkerType, index: number) => {
