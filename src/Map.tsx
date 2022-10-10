@@ -9,14 +9,16 @@ import {
     IconPlus,
     IconTrashBin,
     Stack,
+    debounce,
 } from '@frontify/fondue';
 import style from './style.module.css';
 import { MarkerInput } from './MarkerInput';
 import { Marker as MarkerType, Settings } from './types';
-import { INITIAL_MAP_CENTER, INITIAL_ZOOM } from './config';
+import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM } from './config';
 
 type Props = {
     setMarkers: (markers: MarkerType[]) => void;
+    setMapState: (zoom: number, center: google.maps.LatLng | google.maps.LatLngLiteral) => void;
     isEditing: boolean;
     settings: Settings;
 };
@@ -42,8 +44,8 @@ const mapClassNames: Record<string, Record<string, string>> = {
     },
 };
 
-export const Map: FC<Props> = ({ setMarkers, isEditing, settings }) => {
-    const { markers = [], apiKey, customMapFormat, formatPreset, fixedHeight } = settings;
+export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings }) => {
+    const { markers = [], apiKey, customMapFormat, formatPreset, fixedHeight, mapZoom, mapCenter } = settings;
     const [map, setMap] = useState<MapType>();
 
     const { isLoaded } = useLoadScript({
@@ -52,16 +54,38 @@ export const Map: FC<Props> = ({ setMarkers, isEditing, settings }) => {
     });
 
     const onLoad = useCallback((map) => setMap(map), []);
+    const onBoundsChanged = React.useMemo(
+        () =>
+            debounce(() => {
+                if (isEditing && map) {
+                    const center = map.getCenter();
+                    const lat = center?.lat();
+                    const lng = center?.lng();
+                    if (lat && lng) {
+                        setMapState(map.getZoom() || DEFAULT_MAP_ZOOM, { lat, lng });
+                    }
+                }
+            }, 500),
+        [isEditing, map]
+    );
 
-    const resetZoom = () => {
+    const fitBounds = () => {
         if (map && bounds) {
             map.fitBounds(bounds);
         }
     };
 
     useEffect(() => {
-        resetZoom();
-    }, [map, markers, customMapFormat, formatPreset, fixedHeight]);
+        fitBounds();
+    }, [markers]);
+
+    useEffect(() => {
+        if (isEditing && map) {
+            // Reset map bounds when switching to edit mode
+            map.setZoom(mapZoom || DEFAULT_MAP_ZOOM);
+            map.setCenter(mapCenter || DEFAULT_MAP_CENTER);
+        }
+    }, [isEditing]);
 
     if (!isLoaded) {
         return <div>Loading....</div>;
@@ -92,14 +116,16 @@ export const Map: FC<Props> = ({ setMarkers, isEditing, settings }) => {
                 style={customMapFormat ? { height: fixedHeight ? parseInt(fixedHeight) : 500 } : undefined}
             >
                 <GoogleMap
-                    zoom={INITIAL_ZOOM}
-                    center={INITIAL_MAP_CENTER}
+                    zoom={mapZoom || DEFAULT_MAP_ZOOM}
+                    center={mapCenter || DEFAULT_MAP_CENTER}
                     mapContainerClassName={
                         !customMapFormat
                             ? [style.mapContainerInner, mapClassNames[formatPreset].inner].join(' ')
                             : style.mapContainerCustom
                     }
                     onLoad={onLoad}
+                    onZoomChanged={isEditing ? onBoundsChanged : undefined}
+                    onCenterChanged={isEditing ? onBoundsChanged : undefined}
                 >
                     {markers
                         ? markers
@@ -107,15 +133,15 @@ export const Map: FC<Props> = ({ setMarkers, isEditing, settings }) => {
                               .filter((marker) => marker.location?.lat && marker.location?.lng)
                               .map((marker, index) => {
                                   bounds.extend({
-                                      lat: Number(marker.location.lat),
-                                      lng: Number(marker.location.lng),
+                                      lat: Number(marker.location?.lat),
+                                      lng: Number(marker.location?.lng),
                                   });
                                   return (
                                       <Marker
                                           key={getMarkerKey(marker, index)}
                                           position={{
-                                              lat: Number(marker.location.lat),
-                                              lng: Number(marker.location.lng),
+                                              lat: Number(marker.location?.lat),
+                                              lng: Number(marker.location?.lng),
                                           }}
                                       >
                                           {/*{marker.label && (*/}
@@ -136,7 +162,7 @@ export const Map: FC<Props> = ({ setMarkers, isEditing, settings }) => {
                     <Stack spacing={'s'} padding={'xs'}>
                         <Button
                             type={ButtonType.Button}
-                            onClick={resetZoom}
+                            onClick={fitBounds}
                             rounding={ButtonRounding.Medium}
                             icon={<IconFocalPoint />}
                             style={ButtonStyle.Secondary}
