@@ -66,7 +66,7 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
                     }
                 }
             }, 500),
-        [isEditing, map]
+        [isEditing, customMapFormat, formatPreset, fixedHeight]
     );
 
     const fitBounds = () => {
