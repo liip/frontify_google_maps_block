@@ -22,9 +22,9 @@ type AutocompleteInstance = google.maps.places.Autocomplete;
 
 export const MarkerInput: FC<Props> = ({ marker, index, setMarker, isLoaded }) => {
     const locationId = `location-${index}`;
-    const labelId = `label-${index}`;
+    //const labelId = `label-${index}`;
     const [address, setAddress] = useState<string>(marker.location?.address || '');
-    const [label, setLabel] = useState<string>(marker.label);
+    //const [label, setLabel] = useState<string>(marker.label);
     const [addressInputStyle, setAddressInputStyle] = useState<FormControlStyle>(FormControlStyle.Primary);
     const [addressInputHelperText, setAddressInputHelperText] = useState<string>('');
 
@@ -103,25 +103,25 @@ export const MarkerInput: FC<Props> = ({ marker, index, setMarker, isLoaded }) =
                         />
                     </FormControl>
                 </Autocomplete>
-                <FormControl
-                    clickable
-                    direction={FormControlDirection.Vertical}
-                    label={{
-                        children: 'Label',
-                        htmlFor: labelId,
-                    }}
-                    style={FormControlStyle.Primary}
-                >
-                    <TextInput
-                        id={labelId}
-                        value={label}
-                        type={TextInputType.Text}
-                        onChange={(newLabel) => {
-                            setLabel(newLabel);
-                            debouncedSetMarker({ ...marker, label: newLabel }, index);
-                        }}
-                    />
-                </FormControl>
+                {/*<FormControl*/}
+                {/*    clickable*/}
+                {/*    direction={FormControlDirection.Vertical}*/}
+                {/*    label={{*/}
+                {/*        children: 'Label',*/}
+                {/*        htmlFor: labelId,*/}
+                {/*    }}*/}
+                {/*    style={FormControlStyle.Primary}*/}
+                {/*>*/}
+                {/*    <TextInput*/}
+                {/*        id={labelId}*/}
+                {/*        value={label}*/}
+                {/*        type={TextInputType.Text}*/}
+                {/*        onChange={(newLabel) => {*/}
+                {/*            setLabel(newLabel);*/}
+                {/*            debouncedSetMarker({ ...marker, label: newLabel }, index);*/}
+                {/*        }}*/}
+                {/*    />*/}
+                {/*</FormControl>*/}
             </Stack>
         </div>
     );

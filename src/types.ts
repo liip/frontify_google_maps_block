@@ -12,7 +12,6 @@ export type Marker = {
 
 export type Settings = {
     apiKey: string;
-    showLabels: boolean;
     customMapFormat: boolean;
     formatPreset: string;
     fixedHeight: string;

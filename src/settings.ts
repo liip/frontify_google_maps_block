@@ -1,4 +1,3 @@
-import { IconEnum } from '@frontify/fondue';
 import { BlockSettings, Sections } from '@frontify/guideline-blocks-settings';
 
 export const settings: BlockSettings = {
@@ -9,12 +8,6 @@ export const settings: BlockSettings = {
             defaultValue: '',
             placeholder: 'Paste your API Key here',
             label: 'Google Maps API Key',
-        },
-        {
-            id: 'showLabels',
-            type: 'switch',
-            defaultValue: false,
-            label: 'Show labels on map',
         },
     ],
     [Sections.Layout]: [
