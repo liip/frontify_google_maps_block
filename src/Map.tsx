@@ -70,7 +70,7 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
     );
 
     const fitBounds = () => {
-        if (map && bounds) {
+        if (map && bounds && !bounds.isEmpty()) {
             map.fitBounds(bounds);
         }
     };
