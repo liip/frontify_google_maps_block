@@ -192,7 +192,7 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
                             icon={<IconPlus />}
                             style={ButtonStyle.Secondary}
                         >
-                            Add new Location Marker
+                            Add new location
                         </Button>
                     </Stack>
                 </Fragment>
