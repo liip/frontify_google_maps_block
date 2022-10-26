@@ -14,7 +14,7 @@ import {
 import style from './style.module.css';
 import { MarkerInput } from './MarkerInput';
 import { Marker as MarkerType, Settings } from './types';
-import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM } from './config';
+import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM, MAX_ZOOM } from './config';
 
 type Props = {
     setMarkers: (markers: MarkerType[]) => void;
@@ -54,19 +54,18 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
     });
 
     const onLoad = useCallback((map) => setMap(map), []);
-    const onBoundsChanged = React.useMemo(
-        () =>
-            debounce(() => {
-                if (isEditing && map) {
-                    const center = map.getCenter();
-                    const lat = center?.lat();
-                    const lng = center?.lng();
-                    if (lat && lng) {
-                        setMapState(map.getZoom() || DEFAULT_MAP_ZOOM, { lat, lng });
-                    }
+    const onBoundsChanged = useCallback(
+        debounce(() => {
+            if (isEditing && map) {
+                const center = map.getCenter();
+                const lat = center?.lat();
+                const lng = center?.lng();
+                if (lat && lng) {
+                    setMapState(map.getZoom() || DEFAULT_MAP_ZOOM, { lat, lng });
                 }
-            }, 500),
-        [isEditing, customMapFormat, formatPreset, fixedHeight, markers]
+            }
+        }, 500),
+        [isEditing, map, customMapFormat, formatPreset, fixedHeight, markers]
     );
 
     const fitBounds = () => {
@@ -117,6 +116,9 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
             >
                 <GoogleMap
                     zoom={mapZoom || DEFAULT_MAP_ZOOM}
+                    options={{
+                        maxZoom: MAX_ZOOM,
+                    }}
                     center={mapCenter || DEFAULT_MAP_CENTER}
                     mapContainerClassName={
                         !customMapFormat
