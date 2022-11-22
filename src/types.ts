@@ -6,6 +6,7 @@ export type Location = {
 };
 
 export type Marker = {
+    id: string;
     label: string;
     location?: Location;
 };

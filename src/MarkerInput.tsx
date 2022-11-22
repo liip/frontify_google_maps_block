@@ -14,26 +14,25 @@ import { Marker } from './types';
 type Props = {
     isLoaded: boolean;
     marker: Marker;
-    index: number;
-    setMarker: (marker: Marker, index: number) => void;
+    updateMarker: (marker: Marker) => void;
 };
 
 type AutocompleteInstance = google.maps.places.Autocomplete;
 
-export const MarkerInput: FC<Props> = ({ marker, index, setMarker, isLoaded }) => {
-    const locationId = `location-${index}`;
-    //const labelId = `label-${index}`;
+export const MarkerInput: FC<Props> = ({ marker, updateMarker, isLoaded }) => {
+    const locationId = `location-${marker.id}`;
+    const labelId = `label-${marker.id}`;
     const [address, setAddress] = useState<string>(marker.location?.address || '');
-    //const [label, setLabel] = useState<string>(marker.label);
+    const [label, setLabel] = useState<string>(marker.label);
     const [addressInputStyle, setAddressInputStyle] = useState<FormControlStyle>(FormControlStyle.Primary);
     const [addressInputHelperText, setAddressInputHelperText] = useState<string>('');
 
-    const debouncedSetMarker = React.useMemo(
+    const debouncedUpdateMarker = React.useMemo(
         () =>
-            debounce((marker: Marker, index: number) => {
-                setMarker(marker, index);
+            debounce((marker: Marker) => {
+                updateMarker(marker);
             }, 200),
-        [setMarker]
+        [updateMarker]
     );
 
     const [autocomplete, setAutocomplete] = useState<AutocompleteInstance>();
@@ -54,18 +53,15 @@ export const MarkerInput: FC<Props> = ({ marker, index, setMarker, isLoaded }) =
         if (place?.name) {
             setAddress(place.name);
             resetAddressInput();
-            debouncedSetMarker(
-                {
-                    ...marker,
-                    location: {
-                        address: place.name || '',
-                        placeId: place.place_id,
-                        lat: place.geometry?.location?.lat(),
-                        lng: place.geometry?.location?.lng(),
-                    },
+            debouncedUpdateMarker({
+                ...marker,
+                location: {
+                    address: place.name || '',
+                    placeId: place.place_id,
+                    lat: place.geometry?.location?.lat(),
+                    lng: place.geometry?.location?.lng(),
                 },
-                index
-            );
+            });
         } else {
             console.log('Autocomplete is not loaded yet!');
         }
@@ -103,25 +99,25 @@ export const MarkerInput: FC<Props> = ({ marker, index, setMarker, isLoaded }) =
                         />
                     </FormControl>
                 </Autocomplete>
-                {/*<FormControl*/}
-                {/*    clickable*/}
-                {/*    direction={FormControlDirection.Vertical}*/}
-                {/*    label={{*/}
-                {/*        children: 'Label',*/}
-                {/*        htmlFor: labelId,*/}
-                {/*    }}*/}
-                {/*    style={FormControlStyle.Primary}*/}
-                {/*>*/}
-                {/*    <TextInput*/}
-                {/*        id={labelId}*/}
-                {/*        value={label}*/}
-                {/*        type={TextInputType.Text}*/}
-                {/*        onChange={(newLabel) => {*/}
-                {/*            setLabel(newLabel);*/}
-                {/*            debouncedSetMarker({ ...marker, label: newLabel }, index);*/}
-                {/*        }}*/}
-                {/*    />*/}
-                {/*</FormControl>*/}
+                <FormControl
+                    clickable
+                    direction={FormControlDirection.Vertical}
+                    label={{
+                        children: 'Label',
+                        htmlFor: labelId,
+                    }}
+                    style={FormControlStyle.Primary}
+                >
+                    <TextInput
+                        id={labelId}
+                        value={label}
+                        type={TextInputType.Text}
+                        onChange={(newLabel) => {
+                            setLabel(newLabel);
+                            debouncedUpdateMarker({ ...marker, label: newLabel });
+                        }}
+                    />
+                </FormControl>
             </Stack>
         </div>
     );

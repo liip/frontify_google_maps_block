@@ -23,12 +23,5 @@ export const GoogleMapsBlock: FC<Props> = ({ appBridge }) => {
         setBlockSettings({ mapZoom: zoom, mapCenter: center });
     };
 
-    return (
-        <Map
-            setMarkers={setMarkers}
-            setMapState={setMapState}
-            isEditing={isEditing}
-            settings={blockSettings}
-        />
-    );
+    return <Map setMarkers={setMarkers} setMapState={setMapState} isEditing={isEditing} settings={blockSettings} />;
 };

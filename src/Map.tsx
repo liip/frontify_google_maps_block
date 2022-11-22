@@ -2,6 +2,7 @@ import React, { FC, Fragment, useCallback, useEffect, useState } from 'react';
 import { GoogleMap, InfoWindow, Marker, useLoadScript } from '@react-google-maps/api';
 import {
     Button,
+    ButtonEmphasis,
     ButtonRounding,
     ButtonStyle,
     ButtonType,
@@ -15,6 +16,7 @@ import style from './style.module.css';
 import { MarkerInput } from './MarkerInput';
 import { Marker as MarkerType, Settings } from './types';
 import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM, MAX_ZOOM } from './config';
+import { v4 as uuidv4 } from 'uuid';
 
 type Props = {
     setMarkers: (markers: MarkerType[]) => void;
@@ -92,17 +94,25 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
 
     const bounds = new window.google.maps.LatLngBounds();
 
-    const setMarker = (marker: MarkerType, index: number) => {
-        const newMarkers = [...markers];
-        newMarkers[index] = marker;
-        setMarkers(newMarkers);
+    const updateMarker = (marker: MarkerType) => {
+        const markerIndex = markers.findIndex((m) => m.id === marker.id);
+
+        if (markerIndex === -1) {
+            return;
+        }
+
+        const updatedMarkers = [...markers.slice(0, markerIndex), marker, ...markers.slice(markerIndex + 1)];
+
+        setMarkers(updatedMarkers);
     };
 
-    const deleteMarker = (marker: MarkerType, index: number) => {
-        setMarkers(markers.filter((marker) => marker !== markers[index]));
+    const addNewMarker = () => {
+        setMarkers([...markers, { label: '', id: uuidv4() }]);
     };
 
-    const getMarkerKey = (marker: MarkerType, index: number) => `${marker.location?.placeId || 'newPlace'}-${index}`;
+    const deleteMarker = (marker: MarkerType) => {
+        setMarkers(markers.filter((m) => m.id !== marker.id));
+    };
 
     return (
         <div>
@@ -129,34 +139,31 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
                     onZoomChanged={isEditing ? onBoundsChanged : undefined}
                     onCenterChanged={isEditing ? onBoundsChanged : undefined}
                 >
-                    {markers
-                        ? markers
-                              // Do not render markers without location
-                              .filter((marker) => marker.location?.lat && marker.location?.lng)
-                              .map((marker, index) => {
-                                  bounds.extend({
-                                      lat: Number(marker.location?.lat),
-                                      lng: Number(marker.location?.lng),
-                                  });
-                                  return (
-                                      <Marker
-                                          key={getMarkerKey(marker, index)}
-                                          position={{
-                                              lat: Number(marker.location?.lat),
-                                              lng: Number(marker.location?.lng),
-                                          }}
-                                      >
-                                          {/*{marker.label && (*/}
-                                          {/*    <InfoWindow options={{ maxWidth: 200 }}>*/}
-                                          {/*        <div className={style.infoWindow}>*/}
-                                          {/*            <h1>{marker.label}</h1>*/}
-                                          {/*        </div>*/}
-                                          {/*    </InfoWindow>*/}
-                                          {/*)}*/}
-                                      </Marker>
-                                  );
-                              })
-                        : ''}
+                    {markers &&
+                        markers
+                            // Do not render markers without location
+                            .filter((marker) => marker.location?.lat && marker.location?.lng)
+                            .map((marker) => {
+                                bounds.extend({
+                                    lat: Number(marker.location?.lat),
+                                    lng: Number(marker.location?.lng),
+                                });
+                                return (
+                                    <Marker
+                                        key={marker.id}
+                                        position={{
+                                            lat: Number(marker.location?.lat),
+                                            lng: Number(marker.location?.lng),
+                                        }}
+                                    >
+                                        {marker.label && (
+                                            <InfoWindow options={{ maxWidth: 200 }}>
+                                                <div className={style.infoWindow}>{marker.label}</div>
+                                            </InfoWindow>
+                                        )}
+                                    </Marker>
+                                );
+                            })}
                 </GoogleMap>
             </div>
             {isEditing && (
@@ -167,21 +174,23 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
                             onClick={fitBounds}
                             rounding={ButtonRounding.Medium}
                             icon={<IconFocalPoint />}
-                            style={ButtonStyle.Secondary}
+                            style={ButtonStyle.Default}
+                            emphasis={ButtonEmphasis.Default}
                         >
                             Reset Zoom
                         </Button>
                     </Stack>
-                    {markers.map((marker, index) => {
+                    {markers.map((marker) => {
                         return (
-                            <Stack spacing={'s'} padding={'xs'} align={'end'} key={getMarkerKey(marker, index)}>
-                                <MarkerInput marker={marker} index={index} setMarker={setMarker} isLoaded={isLoaded} />
+                            <Stack spacing={'s'} padding={'xs'} align={'end'} key={marker.id}>
+                                <MarkerInput marker={marker} updateMarker={updateMarker} isLoaded={isLoaded} />
                                 <Button
                                     type={ButtonType.Button}
-                                    onClick={() => deleteMarker(marker, index)}
+                                    onClick={() => deleteMarker(marker)}
                                     rounding={ButtonRounding.Medium}
                                     icon={<IconTrashBin />}
-                                    style={ButtonStyle.Secondary}
+                                    style={ButtonStyle.Danger}
+                                    emphasis={ButtonEmphasis.Strong}
                                 />
                             </Stack>
                         );
@@ -189,10 +198,11 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
                     <Stack spacing={'s'} padding={'xs'}>
                         <Button
                             type={ButtonType.Button}
-                            onClick={() => setMarker({ label: '' }, markers?.length)}
+                            onClick={addNewMarker}
                             rounding={ButtonRounding.Medium}
                             icon={<IconPlus />}
-                            style={ButtonStyle.Secondary}
+                            style={ButtonStyle.Default}
+                            emphasis={ButtonEmphasis.Default}
                         >
                             Add new location
                         </Button>
