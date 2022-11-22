@@ -49,11 +49,19 @@ const mapClassNames: Record<string, Record<string, string>> = {
 export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings }) => {
     const { markers = [], apiKey, customMapFormat, formatPreset, fixedHeight, mapZoom, mapCenter } = settings;
     const [map, setMap] = useState<MapType>();
+    const [activeMarkerId, setActiveMarkerId] = useState<string | null>(null);
 
     const { isLoaded } = useLoadScript({
         googleMapsApiKey: apiKey,
         libraries,
     });
+
+    const handleActiveMarker = (markerId: string) => {
+        if (markerId === activeMarkerId) {
+            return;
+        }
+        setActiveMarkerId(markerId);
+    };
 
     const onLoad = useCallback((map) => setMap(map), []);
     const onBoundsChanged = useCallback(
@@ -86,6 +94,8 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
             map.setZoom(mapZoom || DEFAULT_MAP_ZOOM);
             map.setCenter(mapCenter || DEFAULT_MAP_CENTER);
         }
+        // close open info window
+        setActiveMarkerId(null);
     }, [isEditing]);
 
     if (!isLoaded) {
@@ -155,9 +165,13 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
                                             lat: Number(marker.location?.lat),
                                             lng: Number(marker.location?.lng),
                                         }}
+                                        onClick={() => (marker.label ? handleActiveMarker(marker.id) : undefined)}
                                     >
-                                        {marker.label && (
-                                            <InfoWindow options={{ maxWidth: 200 }}>
+                                        {activeMarkerId === marker.id && marker.label && (
+                                            <InfoWindow
+                                                options={{ maxWidth: 200 }}
+                                                onCloseClick={() => setActiveMarkerId(null)}
+                                            >
                                                 <div className={style.infoWindow}>{marker.label}</div>
                                             </InfoWindow>
                                         )}
