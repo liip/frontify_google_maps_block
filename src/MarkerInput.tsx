@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 import { Autocomplete } from '@react-google-maps/api';
 import {
     FormControl,
@@ -27,12 +27,11 @@ export const MarkerInput: FC<Props> = ({ marker, updateMarker, isLoaded }) => {
     const [addressInputStyle, setAddressInputStyle] = useState<FormControlStyle>(FormControlStyle.Primary);
     const [addressInputHelperText, setAddressInputHelperText] = useState<string>('');
 
-    const debouncedUpdateMarker = React.useMemo(
-        () =>
-            debounce((marker: Marker) => {
-                updateMarker(marker);
-            }, 200),
-        [updateMarker]
+    const debouncedUpdateMarker = useCallback(
+        debounce((marker: Marker) => {
+            updateMarker(marker);
+        }, 150),
+        [updateMarker, marker]
     );
 
     const [autocomplete, setAutocomplete] = useState<AutocompleteInstance>();
