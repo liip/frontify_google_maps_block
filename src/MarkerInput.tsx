@@ -62,8 +62,6 @@ export const MarkerInput: FC<Props> = ({ marker, updateMarker, isLoaded }) => {
                     lng: place.geometry?.location?.lng(),
                 },
             });
-        } else {
-            console.log('Autocomplete is not loaded yet!');
         }
     }
 
