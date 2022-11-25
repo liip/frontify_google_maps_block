@@ -10,6 +10,7 @@ import {
     IconPlus,
     IconTrashBin,
     Stack,
+    Text,
     debounce,
 } from '@frontify/fondue';
 import style from './style.module.css';
@@ -182,7 +183,7 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
             </div>
             {isEditing && (
                 <Fragment>
-                    <Stack spacing={'s'} padding={'xs'}>
+                    <Stack spacing={'s'} padding={'xs'} align={'center'}>
                         <Button
                             type={ButtonType.Button}
                             onClick={fitBounds}
@@ -193,6 +194,10 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
                         >
                             Reset Zoom
                         </Button>
+                        <Text as="p" size="small">
+                            The current map position and zoom level are persisted and used to initialize the map in the
+                            view mode.
+                        </Text>
                     </Stack>
                     {markers.map((marker) => {
                         return (
