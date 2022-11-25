@@ -86,7 +86,9 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
     };
 
     useEffect(() => {
-        fitBounds();
+        if (markers.length === 1) {
+            fitBounds();
+        }
     }, [markers]);
 
     useEffect(() => {
