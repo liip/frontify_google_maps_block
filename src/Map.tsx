@@ -107,6 +107,10 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
 
     const bounds = new window.google.maps.LatLngBounds();
 
+    const nl2br = (str: string) => {
+        return str ? str.replace(/(\r\n|\n\r|\r|\n)/g, '<br />') : str;
+    };
+
     const updateMarker = (marker: MarkerType) => {
         const markerIndex = markers.findIndex((m) => m.id === marker.id);
 
@@ -175,7 +179,10 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
                                                 options={{ maxWidth: 200 }}
                                                 onCloseClick={() => setActiveMarkerId(null)}
                                             >
-                                                <div className={style.infoWindow}>{marker.label}</div>
+                                                <div
+                                                    className={style.infoWindow}
+                                                    dangerouslySetInnerHTML={{ __html: nl2br(marker.label) }}
+                                                />
                                             </InfoWindow>
                                         )}
                                     </Marker>
