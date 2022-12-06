@@ -9,6 +9,8 @@ export const settings: BlockSettings = {
             placeholder: 'Paste your API Key here',
             label: 'Google Maps API Key',
         },
+    ],
+    [Sections.Main]: [
         {
             id: 'allowMapControls',
             type: 'switch',
