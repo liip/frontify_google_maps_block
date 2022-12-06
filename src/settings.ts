@@ -1,7 +1,7 @@
 import { AssetInputMode, BlockSettings, Bundle, Sections } from '@frontify/guideline-blocks-settings';
 
 export const settings: BlockSettings = {
-    [Sections.Basics]: [
+    [Sections.Main]: [
         {
             id: 'apiKey',
             type: 'input',
@@ -10,7 +10,7 @@ export const settings: BlockSettings = {
             label: 'Google Maps API Key',
         },
     ],
-    [Sections.Main]: [
+    [Sections.Basics]: [
         {
             id: 'allowMapControls',
             type: 'switch',
@@ -21,7 +21,6 @@ export const settings: BlockSettings = {
             id: 'markerIconEnabled',
             type: 'switch',
             label: 'Custom Map Marker',
-            switchLabel: 'Enabled',
             defaultValue: false,
             on: [
                 {
