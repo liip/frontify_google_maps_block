@@ -7,8 +7,8 @@ import {
     Stack,
     TextInput,
     TextInputType,
-    debounce,
     Textarea,
+    debounce,
 } from '@frontify/fondue';
 import { Marker } from './types';
 
