@@ -1,4 +1,4 @@
-import { BlockSettings, Sections } from '@frontify/guideline-blocks-settings';
+import { AssetInputMode, BlockSettings, Bundle, Sections } from '@frontify/guideline-blocks-settings';
 
 export const settings: BlockSettings = {
     [Sections.Basics]: [
@@ -8,6 +8,26 @@ export const settings: BlockSettings = {
             defaultValue: '',
             placeholder: 'Paste your API Key here',
             label: 'Google Maps API Key',
+        },
+        {
+            id: 'markerIconEnabled',
+            type: 'switch',
+            label: 'Custom Map Marker',
+            switchLabel: 'Enabled',
+            defaultValue: false,
+            on: [
+                {
+                    id: 'markerIcon',
+                    type: 'assetInput',
+                    mode: AssetInputMode.UploadOnly,
+                    onChange: async (bundle: Bundle) => {
+                        // Wait for value to be exposed with bundle.getBlock('markerIcon')
+                        const assets = await bundle.getAppBridge().getBlockAssets();
+                        const genericImageUrl = assets.markerIcon[0].genericUrl;
+                        bundle.setBlockValue('markerIcon', genericImageUrl);
+                    },
+                },
+            ],
         },
     ],
     [Sections.Main]: [
