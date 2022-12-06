@@ -9,6 +9,14 @@ export const settings: BlockSettings = {
             placeholder: 'Paste your API Key here',
             label: 'Google Maps API Key',
         },
+    ],
+    [Sections.Main]: [
+        {
+            id: 'allowMapControls',
+            type: 'switch',
+            label: 'Allow Map Controls',
+            defaultValue: true,
+        },
         {
             id: 'markerIconEnabled',
             type: 'switch',
@@ -28,14 +36,6 @@ export const settings: BlockSettings = {
                     },
                 },
             ],
-        },
-    ],
-    [Sections.Main]: [
-        {
-            id: 'allowMapControls',
-            type: 'switch',
-            label: 'Allow Map Controls',
-            defaultValue: true,
         },
     ],
     [Sections.Layout]: [
