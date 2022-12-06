@@ -48,7 +48,16 @@ const mapClassNames: Record<string, Record<string, string>> = {
 };
 
 export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings }) => {
-    const { markers = [], apiKey, customMapFormat, formatPreset, fixedHeight, mapZoom, mapCenter } = settings;
+    const {
+        markers = [],
+        apiKey,
+        allowMapControls,
+        customMapFormat,
+        formatPreset,
+        fixedHeight,
+        mapZoom,
+        mapCenter,
+    } = settings;
     const [map, setMap] = useState<MapType>();
     const [activeMarkerId, setActiveMarkerId] = useState<string | null>(null);
 
@@ -145,6 +154,7 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
                     zoom={mapZoom || DEFAULT_MAP_ZOOM}
                     options={{
                         maxZoom: MAX_ZOOM,
+                        disableDefaultUI: !allowMapControls,
                     }}
                     center={mapCenter || DEFAULT_MAP_CENTER}
                     mapContainerClassName={
