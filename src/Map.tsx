@@ -46,6 +46,10 @@ const mapClassNames: Record<string, Record<string, string>> = {
     },
 };
 
+const nl2br = (str: string) => {
+    return str ? str.replace(/(\r\n|\n\r|\r|\n)/g, '<br />') : str;
+};
+
 export const Map: FC<Props> = ({ isEditing, settings, setSettings }) => {
     const { apiKey, customMapFormat, formatPreset, fixedHeight } = settings;
     const [map, setMap] = useState<MapType | undefined>();
@@ -111,10 +115,6 @@ export const Map: FC<Props> = ({ isEditing, settings, setSettings }) => {
     }
 
     const bounds = new window.google.maps.LatLngBounds();
-
-    const nl2br = (str: string) => {
-        return str ? str.replace(/(\r\n|\n\r|\r|\n)/g, '<br />') : str;
-    };
 
     const updateMarker = (marker: MarkerType) => {
         const markerIndex = state.markers.findIndex((m) => m.id === marker.id);
