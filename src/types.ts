@@ -13,6 +13,10 @@ export type Marker = {
 
 export type Settings = {
     apiKey: string;
+    allowMapControls: boolean;
+    markerIcon: string;
+    markerIconEnabled: boolean;
+    customMapStyle: string;
     customMapFormat: boolean;
     formatPreset: string;
     fixedHeight: string;
