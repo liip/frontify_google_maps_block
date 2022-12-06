@@ -48,7 +48,16 @@ const mapClassNames: Record<string, Record<string, string>> = {
 };
 
 export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings }) => {
-    const { markers = [], apiKey, customMapStyle, customMapFormat, formatPreset, fixedHeight, mapZoom, mapCenter } = settings;
+    const {
+        markers = [],
+        apiKey,
+        customMapStyle,
+        customMapFormat,
+        formatPreset,
+        fixedHeight,
+        mapZoom,
+        mapCenter,
+    } = settings;
     const [map, setMap] = useState<MapType>();
     const [activeMarkerId, setActiveMarkerId] = useState<string | null>(null);
 
@@ -58,9 +67,9 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
     });
 
     const mapStyleAsObject = (() => {
-        try{
+        try {
             return JSON.parse(customMapStyle);
-        } catch (e) {
+        } catch (error) {
             return [];
         }
     })();

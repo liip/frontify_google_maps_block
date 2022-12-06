@@ -18,12 +18,12 @@ export const settings: BlockSettings = {
             // Validate in FE
             rules: [
                 {
-                    errorMessage: "Invalid JSON, try using mapstyle.withgoogle.com",
+                    errorMessage: 'Invalid JSON, try using mapstyle.withgoogle.com',
                     validate: (value: string) => {
                         try {
                             JSON.parse(value);
                             return true;
-                        } catch (e) {
+                        } catch (error) {
                             return false;
                         }
                     },
