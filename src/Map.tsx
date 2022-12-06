@@ -16,7 +16,7 @@ import {
 import style from './style.module.css';
 import { MarkerInput } from './MarkerInput';
 import { Marker as MarkerType, Settings } from './types';
-import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM, MAX_ZOOM } from './config';
+import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM, MAX_ZOOM, MARKER_WIDTH, DEFAULT_MARKER_ICON } from './config';
 import { v4 as uuidv4 } from 'uuid';
 
 type Props = {
@@ -48,7 +48,7 @@ const mapClassNames: Record<string, Record<string, string>> = {
 };
 
 export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings }) => {
-    const { markers = [], apiKey, customMapFormat, formatPreset, fixedHeight, mapZoom, mapCenter } = settings;
+    const { markers = [], apiKey, markerIcon, markerIconEnabled, customMapFormat, formatPreset, fixedHeight, mapZoom, mapCenter } = settings;
     const [map, setMap] = useState<MapType>();
     const [activeMarkerId, setActiveMarkerId] = useState<string | null>(null);
 
@@ -56,6 +56,13 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
         googleMapsApiKey: apiKey,
         libraries,
     });
+
+    // Check if marker icon enabled
+    // use default as fallback if not set
+    const genericMarkerIcon = markerIconEnabled
+        ? markerIcon || DEFAULT_MARKER_ICON
+        : DEFAULT_MARKER_ICON;
+    const mapMarkerIcon = genericMarkerIcon.replace(/{width}/, MARKER_WIDTH.toString());
 
     const handleActiveMarker = (markerId: string) => {
         if (markerId === activeMarkerId) {
@@ -172,6 +179,7 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
                                             lat: Number(marker.location?.lat),
                                             lng: Number(marker.location?.lng),
                                         }}
+                                        icon={mapMarkerIcon}
                                         onClick={() => (marker.label ? handleActiveMarker(marker.id) : undefined)}
                                     >
                                         {activeMarkerId === marker.id && marker.label && (
