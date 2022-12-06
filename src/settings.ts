@@ -1,6 +1,6 @@
-import { BlockSettings, Sections } from '@frontify/guideline-blocks-settings';
+import { BlockSettingsStructureExport, Sections } from '@frontify/guideline-blocks-settings';
 
-export const settings: BlockSettings = {
+export const settings: BlockSettingsStructureExport = {
     [Sections.Basics]: [
         {
             id: 'apiKey',
@@ -11,14 +11,13 @@ export const settings: BlockSettings = {
         },
         {
             id: 'customMapStyle',
-            type: 'input',
-            info: 'Create a new Style on mapstyle.withgoogle.com, and paste the generated JSON into this field',
+            type: 'textarea',
+            info: 'Create a new style on mapstyle.withgoogle.com, and paste the generated JSON into this field',
             placeholder: 'Paste your JSON String here',
             label: 'Google Maps Style',
-            // Validate in FE
             rules: [
                 {
-                    errorMessage: 'Invalid JSON, try using mapstyle.withgoogle.com',
+                    errorMessage: 'Invalid JSON, try using https://mapstyle.withgoogle.com',
                     validate: (value: string) => {
                         try {
                             JSON.parse(value);
