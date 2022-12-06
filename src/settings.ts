@@ -1,4 +1,4 @@
-import { BlockSettings, AssetInputMode, Sections, Bundle } from '@frontify/guideline-blocks-settings';
+import { AssetInputMode, BlockSettings, Bundle, Sections } from '@frontify/guideline-blocks-settings';
 
 export const settings: BlockSettings = {
     [Sections.Basics]: [
