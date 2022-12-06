@@ -48,7 +48,7 @@ const mapClassNames: Record<string, Record<string, string>> = {
 };
 
 export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings }) => {
-    const { markers = [], apiKey, customMapFormat, formatPreset, fixedHeight, mapZoom, mapCenter } = settings;
+    const { markers = [], apiKey, customMapStyle, customMapFormat, formatPreset, fixedHeight, mapZoom, mapCenter } = settings;
     const [map, setMap] = useState<MapType>();
     const [activeMarkerId, setActiveMarkerId] = useState<string | null>(null);
 
@@ -56,6 +56,14 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
         googleMapsApiKey: apiKey,
         libraries,
     });
+
+    const mapStyleAsObject = (() => {
+        try{
+            return JSON.parse(customMapStyle);
+        } catch (e) {
+            return [];
+        }
+    })();
 
     const handleActiveMarker = (markerId: string) => {
         if (markerId === activeMarkerId) {
@@ -145,6 +153,7 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
                     zoom={mapZoom || DEFAULT_MAP_ZOOM}
                     options={{
                         maxZoom: MAX_ZOOM,
+                        styles: mapStyleAsObject,
                     }}
                     center={mapCenter || DEFAULT_MAP_CENTER}
                     mapContainerClassName={

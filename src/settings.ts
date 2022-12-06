@@ -9,6 +9,27 @@ export const settings: BlockSettings = {
             placeholder: 'Paste your API Key here',
             label: 'Google Maps API Key',
         },
+        {
+            id: 'customMapStyle',
+            type: 'input',
+            info: 'Create a new Style on mapstyle.withgoogle.com, and paste the generated JSON into this field',
+            placeholder: 'Paste your JSON String here',
+            label: 'Google Maps Style',
+            // Validate in FE
+            rules: [
+                {
+                    errorMessage: "Invalid JSON, try using mapstyle.withgoogle.com",
+                    validate: (value: string) => {
+                        try {
+                            JSON.parse(value);
+                            return true;
+                        } catch (e) {
+                            return false;
+                        }
+                    },
+                },
+            ],
+        },
     ],
     [Sections.Layout]: [
         {
