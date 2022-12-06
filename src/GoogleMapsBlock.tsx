@@ -1,8 +1,9 @@
 import { AppBridgeBlock, useBlockSettings, useEditorState } from '@frontify/app-bridge';
 import React, { FC } from 'react';
-import { Map } from './Map';
+
 import { EmptyState } from './EmtpyState';
-import { Marker, Settings } from './types';
+import { Map } from './Map';
+import { Settings } from './types';
 
 type Props = {
     appBridge: AppBridgeBlock;
@@ -16,12 +17,5 @@ export const GoogleMapsBlock: FC<Props> = ({ appBridge }) => {
         return <EmptyState />;
     }
 
-    const setMarkers = (markers: Marker[]) => {
-        setBlockSettings({ markers });
-    };
-    const setMapState = (zoom: number, center: google.maps.LatLng | google.maps.LatLngLiteral) => {
-        setBlockSettings({ mapZoom: zoom, mapCenter: center });
-    };
-
-    return <Map setMarkers={setMarkers} setMapState={setMapState} isEditing={isEditing} settings={blockSettings} />;
+    return <Map isEditing={isEditing} settings={blockSettings} setSettings={setBlockSettings} />;
 };

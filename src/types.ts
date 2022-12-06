@@ -19,5 +19,5 @@ export type Settings = {
     // None visible settings
     markers?: Marker[];
     mapZoom: number;
-    mapCenter: google.maps.LatLng | google.maps.LatLngLiteral;
+    mapCenter: google.maps.LatLngLiteral;
 };
