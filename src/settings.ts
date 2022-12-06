@@ -37,6 +37,26 @@ export const settings: BlockSettings = {
                 },
             ],
         },
+        {
+            id: 'customMapStyle',
+            type: 'textarea',
+            info: 'Create a new style on mapstyle.withgoogle.com, and paste the generated JSON into this field',
+            placeholder: 'Paste your JSON String here',
+            label: 'Google Maps Style',
+            rules: [
+                {
+                    errorMessage: 'Invalid JSON, try using https://mapstyle.withgoogle.com',
+                    validate: (value: string) => {
+                        try {
+                            JSON.parse(value);
+                            return true;
+                        } catch (error) {
+                            return false;
+                        }
+                    },
+                },
+            ],
+        },
     ],
     [Sections.Layout]: [
         {

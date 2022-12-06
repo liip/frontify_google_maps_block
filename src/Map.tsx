@@ -54,6 +54,7 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
         allowMapControls,
         markerIcon,
         markerIconEnabled,
+        customMapStyle,
         customMapFormat,
         formatPreset,
         fixedHeight,
@@ -72,6 +73,14 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
     // use default as fallback if not set
     const genericMarkerIcon = markerIconEnabled ? markerIcon || DEFAULT_MARKER_ICON : DEFAULT_MARKER_ICON;
     const mapMarkerIcon = genericMarkerIcon.replace(/{width}/, MARKER_WIDTH.toString());
+
+    const mapStyleAsObject = (() => {
+        try {
+            return JSON.parse(customMapStyle);
+        } catch (error) {
+            return [];
+        }
+    })();
 
     const handleActiveMarker = (markerId: string) => {
         if (markerId === activeMarkerId) {
@@ -162,6 +171,7 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
                     options={{
                         maxZoom: MAX_ZOOM,
                         disableDefaultUI: !allowMapControls,
+                        styles: mapStyleAsObject,
                     }}
                     center={mapCenter || DEFAULT_MAP_CENTER}
                     mapContainerClassName={
