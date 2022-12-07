@@ -1,4 +1,4 @@
-import React, { FC, Fragment, useCallback, useEffect, useState } from 'react';
+import { FC, Fragment, useCallback, useEffect, useState } from 'react';
 import { GoogleMap, InfoWindow, Marker, useLoadScript } from '@react-google-maps/api';
 import {
     Button,
@@ -21,7 +21,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 type Props = {
     setMarkers: (markers: MarkerType[]) => void;
-    setMapState: (zoom: number, center: google.maps.LatLng | google.maps.LatLngLiteral) => void;
+    setMapBounds: (zoom: number, center: google.maps.LatLng | google.maps.LatLngLiteral) => void;
+    setMapTypeId: (mapTypeId: string) => void;
     isEditing: boolean;
     settings: Settings;
 };
@@ -47,8 +48,17 @@ const mapClassNames: Record<string, Record<string, string>> = {
     },
 };
 
-export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings }) => {
-    const { markers = [], apiKey, customMapFormat, formatPreset, fixedHeight, mapZoom, mapCenter } = settings;
+export const Map: FC<Props> = ({ setMarkers, setMapBounds, setMapTypeId, isEditing, settings }) => {
+    const {
+        markers = [],
+        apiKey,
+        customMapFormat,
+        formatPreset,
+        fixedHeight,
+        mapZoom,
+        mapCenter,
+        mapTypeId,
+    } = settings;
     const [map, setMap] = useState<MapType>();
     const [activeMarkerId, setActiveMarkerId] = useState<string | null>(null);
 
@@ -65,6 +75,16 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
     };
 
     const onLoad = useCallback((map) => setMap(map), []);
+
+    const onMapTypeChanged = debounce(() => {
+        if (isEditing && map) {
+            const newMapTypeId = map.getMapTypeId();
+            if (newMapTypeId && newMapTypeId !== mapTypeId) {
+                setMapTypeId(newMapTypeId);
+            }
+        }
+    }, 500);
+
     const onBoundsChanged = useCallback(
         debounce(() => {
             if (isEditing && map) {
@@ -72,7 +92,7 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
                 const lat = center?.lat();
                 const lng = center?.lng();
                 if (lat && lng) {
-                    setMapState(map.getZoom() || DEFAULT_MAP_ZOOM, { lat, lng });
+                    setMapBounds(map.getZoom() || DEFAULT_MAP_ZOOM, { lat, lng });
                 }
             }
         }, 500),
@@ -93,9 +113,10 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
 
     useEffect(() => {
         if (isEditing && map) {
-            // Reset map bounds when switching to edit mode
+            // Reset map settings when switching to edit mode
             map.setZoom(mapZoom || DEFAULT_MAP_ZOOM);
             map.setCenter(mapCenter || DEFAULT_MAP_CENTER);
+            map.setMapTypeId(mapTypeId);
         }
         // close open info window
         setActiveMarkerId(null);
@@ -142,10 +163,11 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
                 style={customMapFormat ? { height: fixedHeight ? parseInt(fixedHeight) : 500 } : undefined}
             >
                 <GoogleMap
-                    zoom={mapZoom || DEFAULT_MAP_ZOOM}
                     options={{
                         maxZoom: MAX_ZOOM,
+                        mapTypeId,
                     }}
+                    zoom={mapZoom || DEFAULT_MAP_ZOOM}
                     center={mapCenter || DEFAULT_MAP_CENTER}
                     mapContainerClassName={
                         !customMapFormat
@@ -153,8 +175,8 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
                             : style.mapContainerCustom
                     }
                     onLoad={onLoad}
-                    onZoomChanged={isEditing ? onBoundsChanged : undefined}
-                    onCenterChanged={isEditing ? onBoundsChanged : undefined}
+                    onBoundsChanged={onBoundsChanged}
+                    onMapTypeIdChanged={onMapTypeChanged}
                 >
                     {markers &&
                         markers

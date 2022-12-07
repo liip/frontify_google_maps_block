@@ -20,4 +20,5 @@ export type Settings = {
     markers?: Marker[];
     mapZoom: number;
     mapCenter: google.maps.LatLng | google.maps.LatLngLiteral;
+    mapTypeId: string;
 };
