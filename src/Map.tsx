@@ -13,11 +13,12 @@ import {
 import { GoogleMap, InfoWindow, Marker, useLoadScript } from '@react-google-maps/api';
 import React, { FC, Fragment, useCallback, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { isEqual } from 'lodash-es';
 
 import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM, MAX_ZOOM } from './config';
 import { MarkerInput } from './MarkerInput';
 import style from './style.module.css';
-import { Marker as MarkerType, Settings } from './types';
+import { Marker as MarkerType, Markers, Settings } from './types';
 
 type Props = {
     isEditing: boolean;
@@ -54,18 +55,17 @@ export const Map: FC<Props> = ({ isEditing, settings, setSettings }) => {
     const { apiKey, customMapFormat, formatPreset, fixedHeight } = settings;
     const [map, setMap] = useState<MapType | undefined>();
     const [state, setState] = useState<{
-        markers: MarkerType[];
+        markers: Markers;
         mapZoom: number;
         mapCenter: google.maps.LatLngLiteral;
     }>({
-        markers: settings.markers || [],
+        markers: settings.markers || {},
         mapZoom: settings.mapZoom || DEFAULT_MAP_ZOOM,
         mapCenter: settings.mapCenter || DEFAULT_MAP_CENTER,
     });
     const [activeMarkerId, setActiveMarkerId] = useState<string | null>(null);
 
     useEffect(() => {
-        console.log(state);
         setSettings && setSettings(state);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [state]);
@@ -84,9 +84,20 @@ export const Map: FC<Props> = ({ isEditing, settings, setSettings }) => {
 
     const onLoad = useCallback((map) => setMap(map), []);
 
-    const fitBounds = () => {
-        if (map && bounds && !bounds.isEmpty()) {
-            map.fitBounds(bounds);
+    const fitBounds = (markers: Markers) => {
+        if (map) {
+            const bounds = new window.google.maps.LatLngBounds();
+            for (const markerId in markers) {
+                if (markers[markerId].location?.lat && markers[markerId].location?.lng) {
+                    bounds.extend({
+                        lat: Number(markers[markerId].location?.lat),
+                        lng: Number(markers[markerId].location?.lng),
+                    });
+                }
+            }
+            if (!bounds.isEmpty()) {
+                map.fitBounds(bounds);
+            }
         }
     };
 
@@ -96,6 +107,7 @@ export const Map: FC<Props> = ({ isEditing, settings, setSettings }) => {
             map.setCenter(state.mapCenter);
         }
         if (!isEditing && map) {
+            // Save map state when edit mode is left
             setState({
                 ...state,
                 mapZoom: map.getZoom() || DEFAULT_MAP_ZOOM,
@@ -114,36 +126,39 @@ export const Map: FC<Props> = ({ isEditing, settings, setSettings }) => {
         return <div>Loading....</div>;
     }
 
-    const bounds = new window.google.maps.LatLngBounds();
-
     const updateMarker = (marker: MarkerType) => {
-        const markerIndex = state.markers.findIndex((m) => m.id === marker.id);
+        const newState = {
+            ...state,
+            markers: {
+                ...state.markers,
+                [marker.id]: marker,
+            },
+        };
 
-        if (markerIndex === -1) {
-            return;
+        // Only run fitBounds when location has changed
+        if (!isEqual(state.markers[marker.id]?.location, marker.location)) {
+            fitBounds(newState.markers);
         }
 
-        const updatedMarkers = [
-            ...state.markers.slice(0, markerIndex),
-            marker,
-            ...state.markers.slice(markerIndex + 1),
-        ];
-
-        // Run fitbounds only when it is NOT the label that has changed
-        if (state.markers[markerIndex].label === marker.label) {
-            fitBounds();
-        }
-
-        setState({ ...state, markers: updatedMarkers });
+        setState(newState);
     };
 
     const addNewMarker = () => {
-        setState({ ...state, markers: [...state.markers, { label: '', id: uuidv4() }] });
-        fitBounds();
+        const newMarkerId = uuidv4();
+        setState({
+            ...state,
+            markers: {
+                ...state.markers,
+                [newMarkerId]: { id: newMarkerId, label: '' },
+            },
+        });
     };
 
-    const deleteMarker = (marker: MarkerType) => {
-        setState({ ...state, markers: state.markers.filter((m) => m.id !== marker.id) });
+    const deleteMarker = (markerId: string) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { [markerId]: deletedMarker, ...markersWithoutDeletedMarker } = state.markers;
+        fitBounds(markersWithoutDeletedMarker);
+        setState({ ...state, markers: markersWithoutDeletedMarker });
     };
 
     return (
@@ -170,37 +185,38 @@ export const Map: FC<Props> = ({ isEditing, settings, setSettings }) => {
                     onLoad={onLoad}
                 >
                     {state.markers &&
-                        state.markers
+                        Object.keys(state.markers)
                             // Do not render markers without location
-                            .filter((marker) => marker.location?.lat && marker.location?.lng)
-                            .map((marker) => {
-                                bounds.extend({
-                                    lat: Number(marker.location?.lat),
-                                    lng: Number(marker.location?.lng),
-                                });
-                                return (
-                                    <Marker
-                                        key={marker.id}
-                                        position={{
-                                            lat: Number(marker.location?.lat),
-                                            lng: Number(marker.location?.lng),
-                                        }}
-                                        onClick={() => (marker.label ? handleActiveMarker(marker.id) : undefined)}
-                                    >
-                                        {activeMarkerId === marker.id && marker.label && (
-                                            <InfoWindow
-                                                options={{ maxWidth: 200 }}
-                                                onCloseClick={() => setActiveMarkerId(null)}
-                                            >
-                                                <div
-                                                    className={style.infoWindow}
-                                                    dangerouslySetInnerHTML={{ __html: nl2br(marker.label) }}
-                                                />
-                                            </InfoWindow>
-                                        )}
-                                    </Marker>
-                                );
-                            })}
+                            .filter(
+                                (markerId) =>
+                                    state.markers[markerId].location?.lat && state.markers[markerId].location?.lng
+                            )
+                            .map((markerId) => (
+                                <Marker
+                                    key={markerId}
+                                    position={{
+                                        lat: Number(state.markers[markerId].location?.lat),
+                                        lng: Number(state.markers[markerId].location?.lng),
+                                    }}
+                                    onClick={() =>
+                                        state.markers[markerId].label ? handleActiveMarker(markerId) : undefined
+                                    }
+                                >
+                                    {activeMarkerId === state.markers[markerId].id && state.markers[markerId].label && (
+                                        <InfoWindow
+                                            options={{ maxWidth: 200 }}
+                                            onCloseClick={() => setActiveMarkerId(null)}
+                                        >
+                                            <div
+                                                className={style.infoWindow}
+                                                dangerouslySetInnerHTML={{
+                                                    __html: nl2br(state.markers[markerId].label),
+                                                }}
+                                            />
+                                        </InfoWindow>
+                                    )}
+                                </Marker>
+                            ))}
                 </GoogleMap>
             </div>
             {isEditing && (
@@ -208,7 +224,7 @@ export const Map: FC<Props> = ({ isEditing, settings, setSettings }) => {
                     <Stack spacing={'s'} padding={'xs'} align={'center'}>
                         <Button
                             type={ButtonType.Button}
-                            onClick={fitBounds}
+                            onClick={() => fitBounds(state.markers)}
                             rounding={ButtonRounding.Medium}
                             icon={<IconFocalPoint />}
                             style={ButtonStyle.Default}
@@ -221,21 +237,23 @@ export const Map: FC<Props> = ({ isEditing, settings, setSettings }) => {
                             view mode.
                         </Text>
                     </Stack>
-                    {state.markers.map((marker) => {
-                        return (
-                            <Stack spacing={'s'} padding={'xs'} align={'end'} key={marker.id}>
-                                <MarkerInput marker={marker} updateMarker={updateMarker} isLoaded={isLoaded} />
-                                <Button
-                                    type={ButtonType.Button}
-                                    onClick={() => deleteMarker(marker)}
-                                    rounding={ButtonRounding.Medium}
-                                    icon={<IconTrashBin />}
-                                    style={ButtonStyle.Danger}
-                                    emphasis={ButtonEmphasis.Strong}
-                                />
-                            </Stack>
-                        );
-                    })}
+                    {Object.keys(state.markers).map((markerId) => (
+                        <Stack spacing={'s'} padding={'xs'} align={'end'} key={state.markers[markerId].id}>
+                            <MarkerInput
+                                marker={state.markers[markerId]}
+                                updateMarker={updateMarker}
+                                isLoaded={isLoaded}
+                            />
+                            <Button
+                                type={ButtonType.Button}
+                                onClick={() => deleteMarker(markerId)}
+                                rounding={ButtonRounding.Medium}
+                                icon={<IconTrashBin />}
+                                style={ButtonStyle.Danger}
+                                emphasis={ButtonEmphasis.Strong}
+                            />
+                        </Stack>
+                    ))}
                     <Stack spacing={'s'} padding={'xs'}>
                         <Button
                             type={ButtonType.Button}

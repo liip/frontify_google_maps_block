@@ -5,6 +5,10 @@ export type Location = {
     lng: number;
 };
 
+export type Markers = {
+    [key: string]: Marker;
+};
+
 export type Marker = {
     id: string;
     label: string;
@@ -17,7 +21,7 @@ export type Settings = {
     formatPreset: string;
     fixedHeight: string;
     // None visible settings
-    markers?: Marker[];
+    markers?: Markers;
     mapZoom: number;
     mapCenter: google.maps.LatLngLiteral;
 };
