@@ -24,6 +24,7 @@ type Props = {
     isEditing: boolean;
     settings: Settings;
     setSettings: (newSettings: Partial<Settings>) => Promise<void>;
+    setIsReadyForPrint: (isReady: boolean) => void;
 };
 
 type MapType = google.maps.Map;
@@ -51,7 +52,7 @@ const nl2br = (str: string) => {
     return str ? str.replace(/(\r\n|\n\r|\r|\n)/g, '<br />') : str;
 };
 
-export const Map: FC<Props> = ({ isEditing, settings, setSettings }) => {
+export const Map: FC<Props> = ({ isEditing, settings, setSettings, setIsReadyForPrint }) => {
     const { apiKey, customMapFormat, formatPreset, fixedHeight } = settings;
     const [map, setMap] = useState<MapType | undefined>();
     const [state, setState] = useState<{
@@ -82,7 +83,13 @@ export const Map: FC<Props> = ({ isEditing, settings, setSettings }) => {
         setActiveMarkerId(markerId);
     };
 
-    const onLoad = useCallback((map) => setMap(map), []);
+    const onLoad = useCallback(
+        (map) => {
+            setMap(map);
+            setIsReadyForPrint(true);
+        },
+        [setIsReadyForPrint]
+    );
 
     const fitBounds = (markers: Markers) => {
         if (map) {
