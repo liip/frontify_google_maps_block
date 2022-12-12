@@ -13,7 +13,7 @@ import {
 import { GoogleMap, InfoWindow, Marker, useLoadScript } from '@react-google-maps/api';
 import React, { FC, Fragment, useCallback, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { isEqual } from 'lodash-es';
+import { debounce, isEqual } from 'lodash-es';
 
 import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM, MAX_ZOOM } from './config';
 import { MarkerInput } from './MarkerInput';
@@ -76,6 +76,27 @@ export const Map: FC<Props> = ({ isEditing, settings, setSettings, setIsReadyFor
         libraries,
     });
 
+    const onBoundsChanged = debounce(() => {
+        const zoom = map?.getZoom();
+        const center = map?.getCenter();
+
+        if (isEditing && map && zoom && center) {
+            const lat = center.lat();
+            const lng = center.lng();
+
+            if (zoom !== state.mapZoom || lat !== state.mapCenter.lat || lng !== state.mapCenter.lng) {
+                setState({
+                    ...state,
+                    mapZoom: zoom,
+                    mapCenter: {
+                        lat,
+                        lng,
+                    },
+                });
+            }
+        }
+    }, 500);
+
     const handleActiveMarker = (markerId: string) => {
         if (markerId === activeMarkerId) {
             return;
@@ -113,17 +134,7 @@ export const Map: FC<Props> = ({ isEditing, settings, setSettings, setIsReadyFor
             map.setZoom(state.mapZoom);
             map.setCenter(state.mapCenter);
         }
-        if (!isEditing && map) {
-            // Save map state when edit mode is left
-            setState({
-                ...state,
-                mapZoom: map.getZoom() || DEFAULT_MAP_ZOOM,
-                mapCenter: {
-                    lat: map.getCenter()?.lat() || DEFAULT_MAP_CENTER.lat,
-                    lng: map.getCenter()?.lng() || DEFAULT_MAP_CENTER.lng,
-                },
-            });
-        }
+
         // close open info window
         setActiveMarkerId(null);
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -190,6 +201,7 @@ export const Map: FC<Props> = ({ isEditing, settings, setSettings, setIsReadyFor
                             : style.mapContainerCustom
                     }
                     onLoad={onLoad}
+                    onBoundsChanged={onBoundsChanged}
                 >
                     {state.markers &&
                         Object.keys(state.markers)
