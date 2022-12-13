@@ -1,6 +1,7 @@
-import { BlockSettingsStructureExport, Sections } from '@frontify/guideline-blocks-settings';
+import { Sections } from '@frontify/guideline-blocks-settings';
+import { defineSettings } from '@frontify/guideline-blocks-settings';
 
-export const settings: BlockSettingsStructureExport = {
+export const settings = defineSettings({
     [Sections.Basics]: [
         {
             id: 'apiKey',
@@ -54,4 +55,4 @@ export const settings: BlockSettingsStructureExport = {
             ],
         },
     ],
-};
+});
