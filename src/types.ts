@@ -16,7 +16,8 @@ export type Settings = {
     allowMapControls: boolean;
     markerIcon: string;
     markerIconEnabled: boolean;
-    customMapStyle: string;
+    mapStyle: string;
+    mapStyleEnabled: boolean;
     customMapFormat: boolean;
     formatPreset: string;
     fixedHeight: string;
