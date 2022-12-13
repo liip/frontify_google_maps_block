@@ -240,8 +240,7 @@ export const Map: FC<Props> = ({ isEditing, settings, setSettings, setIsReadyFor
                             Reset Zoom
                         </Button>
                         <Text as="p" size="small">
-                            The current map position and zoom level are persisted and used to initialize the map in the
-                            view mode.
+                            The current map position and zoom level are persisted as soon as you switch back to the view mode.
                         </Text>
                     </Stack>
                     {Object.keys(state.markers).map((markerId) => (
