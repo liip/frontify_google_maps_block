@@ -1,5 +1,5 @@
 {
-	"name": "google-map-block",
+	"name": "frontify_google_maps_block",
 	"version": "1.0.0",
 	"main": "src/index.tsx",
 	"scripts": {
