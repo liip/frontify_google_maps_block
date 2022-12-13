@@ -1,9 +1,9 @@
 {
 	"name": "google-map-block",
 	"version": "1.0.0",
-	"main": "src/index.ts",
+	"main": "src/index.tsx",
 	"scripts": {
-		"serve": "frontify-cli block serve --entryPath src/index.ts",
+		"serve": "frontify-cli block serve --entryPath src/index.tsx",
 		"lint": "eslint './**/*.{ts,tsx,js}'",
 		"typecheck": "tsc"
 	},
