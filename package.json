@@ -7,10 +7,10 @@
 		"lint": "eslint './**/*.{ts,tsx,js}'"
 	},
 	"dependencies": {
-		"@frontify/app-bridge": "3.0.0-beta.29",
-		"@frontify/fondue": "^12.0.0-beta.24",
+		"@frontify/app-bridge": "3.0.0-beta.33",
+		"@frontify/fondue": "^12.0.0-beta.33",
 		"@reach/combobox": "^0.18.0",
-		"@react-google-maps/api": "^2.17.0",
+		"@react-google-maps/api": "^2.17.1",
 		"lodash-es": "^4.17.21",
 		"react": "^17.0.2",
 		"react-dom": "^17.0.2",
@@ -19,16 +19,16 @@
 	},
 	"devDependencies": {
 		"@frontify/eslint-config-react": "0.15.5",
-		"@frontify/frontify-cli": "5.2.1",
-		"@frontify/guideline-blocks-settings": "0.25.0",
-		"@types/node": "^18.11.9",
+		"@frontify/frontify-cli": "5.3.4",
+		"@frontify/guideline-blocks-settings": "0.25.7",
+		"@types/node": "^18.11.14",
 		"@types/react": "17.0.52",
 		"@types/uuid": "^9.0.0",
 		"autoprefixer": "10.4.13",
-		"eslint": "8.28.0",
-		"postcss": "8.4.19",
+		"eslint": "8.29.0",
+		"postcss": "8.4.20",
 		"postcss-modules": "6.0.0",
-		"prettier": "2.7.1",
-		"typescript": "4.9.3"
+		"prettier": "2.8.1",
+		"typescript": "4.9.4"
 	}
 }
