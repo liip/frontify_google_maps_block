@@ -1,6 +1,6 @@
-import { AssetInputMode, BlockSettings, Bundle, Sections } from '@frontify/guideline-blocks-settings';
+import { AssetInputMode, BlockSettingsStructureExport, Bundle, Sections } from '@frontify/guideline-blocks-settings';
 
-export const settings: BlockSettings = {
+export const settings: BlockSettingsStructureExport = {
     [Sections.Main]: [
         {
             id: 'apiKey',
@@ -37,22 +37,29 @@ export const settings: BlockSettings = {
             ],
         },
         {
-            id: 'customMapStyle',
-            type: 'textarea',
+            id: 'mapStyleEnabled',
+            type: 'switch',
+            label: 'Custom Map Style',
             info: 'Create a new style on mapstyle.withgoogle.com, and paste the generated JSON into this field',
-            placeholder: 'Paste your JSON String here',
-            label: 'Google Maps Style',
-            rules: [
+            defaultValue: false,
+            on: [
                 {
-                    errorMessage: 'Invalid JSON, try using https://mapstyle.withgoogle.com',
-                    validate: (value: string) => {
-                        try {
-                            JSON.parse(value);
-                            return true;
-                        } catch (error) {
-                            return false;
-                        }
-                    },
+                    id: 'mapStyle',
+                    type: 'textarea',
+                    defaultValue: '[]',
+                    rules: [
+                        {
+                            errorMessage: 'Invalid JSON, try using https://mapstyle.withgoogle.com',
+                            validate: (value: string) => {
+                                try {
+                                    JSON.parse(value);
+                                    return true;
+                                } catch (error) {
+                                    return false;
+                                }
+                            },
+                        },
+                    ],
                 },
             ],
         },

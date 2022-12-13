@@ -16,7 +16,7 @@ import {
 import style from './style.module.css';
 import { MarkerInput } from './MarkerInput';
 import { Marker as MarkerType, Settings } from './types';
-import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM, DEFAULT_MARKER_ICON, MARKER_WIDTH, MAX_ZOOM } from './config';
+import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM, DEFAULT_MARKER_ICON, DEFAULT_MAP_STYLE, MARKER_WIDTH, MAX_ZOOM } from './config';
 import { v4 as uuidv4 } from 'uuid';
 
 type Props = {
@@ -54,7 +54,8 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
         allowMapControls,
         markerIcon,
         markerIconEnabled,
-        customMapStyle,
+        mapStyle,
+        mapStyleEnabled,
         customMapFormat,
         formatPreset,
         fixedHeight,
@@ -74,13 +75,7 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
     const genericMarkerIcon = markerIconEnabled ? markerIcon || DEFAULT_MARKER_ICON : DEFAULT_MARKER_ICON;
     const mapMarkerIcon = genericMarkerIcon.replace(/{width}/, MARKER_WIDTH.toString());
 
-    const mapStyleAsObject = (() => {
-        try {
-            return JSON.parse(customMapStyle);
-        } catch (error) {
-            return [];
-        }
-    })();
+    const styleAsObject = mapStyleEnabled ? JSON.parse(mapStyle) : DEFAULT_MAP_STYLE;
 
     const handleActiveMarker = (markerId: string) => {
         if (markerId === activeMarkerId) {
@@ -171,7 +166,7 @@ export const Map: FC<Props> = ({ setMarkers, setMapState, isEditing, settings })
                     options={{
                         maxZoom: MAX_ZOOM,
                         disableDefaultUI: !allowMapControls,
-                        styles: mapStyleAsObject,
+                        styles: styleAsObject,
                     }}
                     center={mapCenter || DEFAULT_MAP_CENTER}
                     mapContainerClassName={
