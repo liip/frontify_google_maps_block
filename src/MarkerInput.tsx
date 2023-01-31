@@ -84,13 +84,16 @@ export const MarkerInput: FC<Props> = ({ marker, updateMarker, isLoaded }) => {
                         helper={addressInputHelperText ? { text: addressInputHelperText } : undefined}
                         style={addressInputStyle}
                     >
+
                         <TextInput
                             id={locationId}
-                            value={address || ''}
+                            value={address}
                             type={TextInputType.Text}
                             required={true}
                             onChange={(newAddress) => {
                                 setAddress(newAddress);
+                            }}
+                            onBlur={() => {
                                 setAddressInputHelperText('Please select a suggested place from the dropdown!');
                                 setAddressInputStyle(FormControlStyle.Danger);
                             }}
@@ -106,11 +109,11 @@ export const MarkerInput: FC<Props> = ({ marker, updateMarker, isLoaded }) => {
                     }}
                     style={FormControlStyle.Primary}
                 >
-                    <Textarea
+                    <TextInput
                         id={labelId}
                         value={label}
-                        autosize={true}
-                        onInput={(newLabel) => {
+                        type={TextInputType.Text}
+                        onChange={(newLabel) => {
                             setLabel(newLabel);
                             debouncedUpdateMarker({ ...marker, label: newLabel });
                         }}

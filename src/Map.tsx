@@ -229,16 +229,18 @@ export const Map: FC<Props> = ({ isEditing, settings, setSettings, setIsReadyFor
             {isEditing && (
                 <Fragment>
                     <Stack spacing={'s'} padding={'xs'} align={'center'}>
-                        <Button
-                            type={ButtonType.Button}
-                            onClick={() => fitBounds(state.markers)}
-                            rounding={ButtonRounding.Medium}
-                            icon={<IconFocalPoint />}
-                            style={ButtonStyle.Default}
-                            emphasis={ButtonEmphasis.Default}
-                        >
-                            Reset Zoom
-                        </Button>
+                        <div className={'tw-flex-shrink-0'}>
+                            <Button
+                                type={ButtonType.Button}
+                                onClick={() => fitBounds(state.markers)}
+                                rounding={ButtonRounding.Medium}
+                                icon={<IconFocalPoint />}
+                                style={ButtonStyle.Default}
+                                emphasis={ButtonEmphasis.Default}
+                            >
+                                Fit Zoom to Markers
+                            </Button>
+                        </div>
                         <Text as="p" size="small">
                             The current map position and zoom level are persisted as soon as you switch back to the view
                             mode.
