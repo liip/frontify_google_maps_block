@@ -7,7 +7,6 @@ import {
     Stack,
     TextInput,
     TextInputType,
-    Textarea,
     debounce,
 } from '@frontify/fondue';
 import { Marker } from './types';
@@ -23,13 +22,13 @@ type AutocompleteInstance = google.maps.places.Autocomplete;
 export const MarkerInput: FC<Props> = ({ marker, updateMarker, isLoaded }) => {
     const locationId = `location-${marker.id}`;
     const labelId = `label-${marker.id}`;
-    const [internalLabel, setInternalLabel] = useState<string>(marker.location?.address || '');
-    const [selectedLabel, setSelectedLabel] = useState<string>(marker.location?.address || '');
+    const [internalLocation, setInternalLocation] = useState<string>(marker.location?.name || '');
+    const [selectedLocation, setSelectedLocation] = useState<string>(marker.location?.name || '');
     const [label, setLabel] = useState<string>(marker.label);
-    const [addressInputStyle, setAddressInputStyle] = useState<FormControlStyle>(FormControlStyle.Primary);
-    const [addressInputHelperText, setAddressInputHelperText] = useState<string>('');
+    const [locationInputStyle, setLocationInputStyle] = useState<FormControlStyle>(FormControlStyle.Primary);
+    const [locationInputHelperText, setLocationInputHelperText] = useState<string>('');
 
-    const debouncedUpdateMarker = useCallback(
+    const debouncedUpdateMarker = useCallback<(marker: Marker) => void>(
         debounce((marker: Marker) => {
             updateMarker(marker);
         }, 150),
@@ -44,24 +43,25 @@ export const MarkerInput: FC<Props> = ({ marker, updateMarker, isLoaded }) => {
         }
     };
 
-    const resetAddressInput = () => {
-        setAddressInputHelperText('');
-        setAddressInputStyle(FormControlStyle.Primary);
+    const resetLocationInput = () => {
+        setLocationInputHelperText('');
+        setLocationInputStyle(FormControlStyle.Primary);
     };
 
     function onPlaceChanged() {
         const place = autocomplete?.getPlace();
-        if (place?.name) {
-            setInternalLabel(place.name);
-            setSelectedLabel(place.name);
-            resetAddressInput();
+        // Check for place_id as well since hitting enter while typing without selecting a place passes an unknown place with the given string as it's name
+        if (place?.name && place?.place_id) {
+            setInternalLocation(place.name);
+            setSelectedLocation(place.name);
+            resetLocationInput();
             debouncedUpdateMarker({
                 ...marker,
                 location: {
-                    address: place.name || '',
-                    placeId: place.place_id,
-                    lat: place.geometry?.location?.lat(),
-                    lng: place.geometry?.location?.lng(),
+                    name: place.name || '',
+                    placeId: place.place_id || '',
+                    lat: place.geometry?.location?.lat() || 0,
+                    lng: place.geometry?.location?.lng() || 0,
                 },
             });
         }
@@ -83,23 +83,23 @@ export const MarkerInput: FC<Props> = ({ marker, updateMarker, isLoaded }) => {
                             htmlFor: locationId,
                             required: true,
                         }}
-                        helper={addressInputHelperText ? { text: addressInputHelperText } : undefined}
-                        style={addressInputStyle}
+                        helper={locationInputHelperText ? { text: locationInputHelperText } : undefined}
+                        style={locationInputStyle}
                     >
                         <TextInput
                             id={locationId}
-                            value={internalLabel}
+                            value={internalLocation}
                             type={TextInputType.Text}
                             required={true}
-                            onChange={(newLabel) => {
-                                setInternalLabel(newLabel);
+                            onChange={(newLocation) => {
+                                setInternalLocation(newLocation);
                             }}
                             onBlur={() => {
-                                if (internalLabel !== selectedLabel) {
-                                    setAddressInputHelperText('Please select a suggested place from the dropdown!');
-                                    setAddressInputStyle(FormControlStyle.Danger);
+                                if (internalLocation !== selectedLocation) {
+                                    setLocationInputHelperText('Please select a suggested place from the dropdown!');
+                                    setLocationInputStyle(FormControlStyle.Danger);
                                 } else {
-                                    resetAddressInput();
+                                    resetLocationInput();
                                 }
                             }}
                         />
