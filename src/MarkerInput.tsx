@@ -7,6 +7,7 @@ import {
     Stack,
     TextInput,
     TextInputType,
+    Textarea,
     debounce,
 } from '@frontify/fondue';
 import { Marker } from './types';
@@ -114,11 +115,11 @@ export const MarkerInput: FC<Props> = ({ marker, updateMarker, isLoaded }) => {
                     }}
                     style={FormControlStyle.Primary}
                 >
-                    <TextInput
+                    <Textarea
                         id={labelId}
                         value={label}
-                        type={TextInputType.Text}
-                        onChange={(newLabel) => {
+                        autosize={true}
+                        onInput={(newLabel) => {
                             setLabel(newLabel);
                             debouncedUpdateMarker({ ...marker, label: newLabel });
                         }}
