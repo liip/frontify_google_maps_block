@@ -1,4 +1,4 @@
-import { Sections } from '@frontify/guideline-blocks-settings';
+import { appendUnit, Sections } from '@frontify/guideline-blocks-settings';
 import { defineSettings } from '@frontify/guideline-blocks-settings';
 
 export const settings = defineSettings({
@@ -23,6 +23,9 @@ export const settings = defineSettings({
                     id: 'fixedHeight',
                     type: 'input',
                     placeholder: '500px',
+                    onChange: (bundle) => {
+                        appendUnit(bundle, 'fixedHeight');
+                    },
                     rules: [
                         {
                             errorMessage: "Please use a numerical value with or without 'px'",
