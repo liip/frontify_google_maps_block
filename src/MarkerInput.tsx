@@ -23,7 +23,8 @@ type AutocompleteInstance = google.maps.places.Autocomplete;
 export const MarkerInput: FC<Props> = ({ marker, updateMarker, isLoaded }) => {
     const locationId = `location-${marker.id}`;
     const labelId = `label-${marker.id}`;
-    const [address, setAddress] = useState<string>(marker.location?.address || '');
+    const [internalLabel, setInternalLabel] = useState<string>(marker.location?.address || '');
+    const [selectedLabel, setSelectedLabel] = useState<string>(marker.location?.address || '');
     const [label, setLabel] = useState<string>(marker.label);
     const [addressInputStyle, setAddressInputStyle] = useState<FormControlStyle>(FormControlStyle.Primary);
     const [addressInputHelperText, setAddressInputHelperText] = useState<string>('');
@@ -51,7 +52,8 @@ export const MarkerInput: FC<Props> = ({ marker, updateMarker, isLoaded }) => {
     function onPlaceChanged() {
         const place = autocomplete?.getPlace();
         if (place?.name) {
-            setAddress(place.name);
+            setInternalLabel(place.name);
+            setSelectedLabel(place.name);
             resetAddressInput();
             debouncedUpdateMarker({
                 ...marker,
@@ -84,18 +86,21 @@ export const MarkerInput: FC<Props> = ({ marker, updateMarker, isLoaded }) => {
                         helper={addressInputHelperText ? { text: addressInputHelperText } : undefined}
                         style={addressInputStyle}
                     >
-
                         <TextInput
                             id={locationId}
-                            value={address}
+                            value={internalLabel}
                             type={TextInputType.Text}
                             required={true}
-                            onChange={(newAddress) => {
-                                setAddress(newAddress);
+                            onChange={(newLabel) => {
+                                setInternalLabel(newLabel);
                             }}
                             onBlur={() => {
-                                setAddressInputHelperText('Please select a suggested place from the dropdown!');
-                                setAddressInputStyle(FormControlStyle.Danger);
+                                if (internalLabel !== selectedLabel) {
+                                    setAddressInputHelperText('Please select a suggested place from the dropdown!');
+                                    setAddressInputStyle(FormControlStyle.Danger);
+                                } else {
+                                    resetAddressInput();
+                                }
                             }}
                         />
                     </FormControl>
