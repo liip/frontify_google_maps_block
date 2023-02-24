@@ -1,5 +1,4 @@
-import { appendUnit, Sections } from '@frontify/guideline-blocks-settings';
-import { defineSettings } from '@frontify/guideline-blocks-settings';
+import { Sections, appendUnit, defineSettings } from '@frontify/guideline-blocks-settings';
 
 export const settings = defineSettings({
     [Sections.Basics]: [
