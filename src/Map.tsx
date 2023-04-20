@@ -17,6 +17,8 @@ import isEqual from 'lodash-es/isEqual';
 
 import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM, MAX_ZOOM } from './config';
 import { MarkerInput } from './MarkerInput';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import style from './style.module.css';
 import { Marker as MarkerType, Markers, Settings } from './types';
 
