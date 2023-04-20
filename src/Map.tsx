@@ -49,7 +49,7 @@ const mapClassNames: Record<string, Record<string, string>> = {
 };
 
 const nl2br = (str: string) => {
-    return str ? str.replace(/(\r\n|\n\r|\r|\n)/g, '<br />') : str;
+    return str ? str.replaceAll(/(\r\n|\n\r|\r|\n)/g, '<br />') : str;
 };
 
 export const Map: FC<Props> = ({ isEditing, settings, setSettings, setIsReadyForPrint }) => {
