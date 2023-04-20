@@ -13,7 +13,7 @@ import {
 import { GoogleMap, InfoWindow, Marker, useLoadScript } from '@react-google-maps/api';
 import React, { FC, Fragment, useCallback, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { isEqual } from 'lodash-es';
+import isEqual from 'lodash-es/isEqual';
 
 import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM, MAX_ZOOM } from './config';
 import { MarkerInput } from './MarkerInput';
@@ -108,10 +108,16 @@ export const Map: FC<Props> = ({ isEditing, settings, setSettings, setIsReadyFor
         }
     };
 
-    useEffect(() => {
-        if (isEditing && map) {
+    const resetZoom = () => {
+        if (map) {
             map.setZoom(state.mapZoom);
             map.setCenter(state.mapCenter);
+        }
+    };
+
+    useEffect(() => {
+        if (isEditing && map) {
+            resetZoom();
         }
         if (!isEditing && map) {
             // Save map state when edit mode is left
@@ -127,7 +133,7 @@ export const Map: FC<Props> = ({ isEditing, settings, setSettings, setIsReadyFor
         // close open info window
         setActiveMarkerId(null);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isEditing, map]);
+    }, [isEditing]);
 
     if (!isLoaded) {
         return <div>Loading....</div>;
@@ -226,7 +232,7 @@ export const Map: FC<Props> = ({ isEditing, settings, setSettings, setIsReadyFor
                             ))}
                 </GoogleMap>
             </div>
-            {isEditing && (
+            {isEditing ? (
                 <Fragment>
                     <Stack spacing={'s'} padding={'xs'} align={'center'}>
                         <div className={'tw-flex-shrink-0'}>
@@ -278,6 +284,19 @@ export const Map: FC<Props> = ({ isEditing, settings, setSettings, setIsReadyFor
                         </Button>
                     </Stack>
                 </Fragment>
+            ) : (
+                <Stack spacing={'s'} padding={'xs'} align={'center'}>
+                    <Button
+                        type={ButtonType.Button}
+                        onClick={() => resetZoom()}
+                        rounding={ButtonRounding.Medium}
+                        icon={<IconFocalPoint />}
+                        style={ButtonStyle.Default}
+                        emphasis={ButtonEmphasis.Default}
+                    >
+                        Reset Zoom
+                    </Button>
+                </Stack>
             )}
         </div>
     );
