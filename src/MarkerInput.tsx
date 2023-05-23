@@ -12,7 +12,7 @@ import {
 } from '@frontify/fondue';
 import { Marker } from './types';
 
-import css from './markerInput.module.css';
+import css from './style.module.css';
 
 type Props = {
     isLoaded: boolean;
