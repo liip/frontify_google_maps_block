@@ -17,9 +17,10 @@ import isEqual from 'lodash-es/isEqual';
 
 import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM, MAX_ZOOM } from './config';
 import { MarkerInput } from './MarkerInput';
-import { Marker as MarkerType, Markers, Settings } from './types';
-
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import style from './style.module.css';
+import { Marker as MarkerType, Markers, Settings } from './types';
 
 type Props = {
     isEditing: boolean;
@@ -108,6 +109,11 @@ export const Map: FC<Props> = ({ isEditing, settings, setSettings, setIsReadyFor
             }
         }
     };
+
+    useEffect(() => {
+        fitBounds(state.markers);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [settings.fixedHeight, settings.formatPreset, settings.customMapFormat]);
 
     const resetZoom = () => {
         if (map) {
@@ -295,7 +301,7 @@ export const Map: FC<Props> = ({ isEditing, settings, setSettings, setIsReadyFor
                         style={ButtonStyle.Default}
                         emphasis={ButtonEmphasis.Default}
                     >
-                        Reset Zoom
+                        Reset to default
                     </Button>
                 </Stack>
             )}
