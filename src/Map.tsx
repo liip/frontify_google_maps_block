@@ -109,11 +109,6 @@ export const Map: FC<Props> = ({ isEditing, settings, setSettings, setIsReadyFor
         }
     };
 
-    useEffect(() => {
-        fitBounds(state.markers);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [settings.fixedHeight, settings.formatPreset, settings.customMapFormat]);
-
     const resetZoom = () => {
         if (map) {
             map.setZoom(state.mapZoom);
