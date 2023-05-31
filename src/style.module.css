@@ -50,3 +50,8 @@
     color: #000000;
     padding: 0 8px;
 }
+
+.textareaContainer textarea {
+    padding-top: 9px;
+    padding-bottom: 9px;
+}

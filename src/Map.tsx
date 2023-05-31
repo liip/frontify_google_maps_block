@@ -17,9 +17,9 @@ import isEqual from 'lodash-es/isEqual';
 
 import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM, MAX_ZOOM } from './config';
 import { MarkerInput } from './MarkerInput';
-import { Marker as MarkerType, Markers, Settings } from './types';
 
 import style from './style.module.css';
+import { Marker as MarkerType, Markers, Settings } from './types';
 
 type Props = {
     isEditing: boolean;
@@ -295,7 +295,7 @@ export const Map: FC<Props> = ({ isEditing, settings, setSettings, setIsReadyFor
                         style={ButtonStyle.Default}
                         emphasis={ButtonEmphasis.Default}
                     >
-                        Reset Zoom
+                        Reset to default
                     </Button>
                 </Stack>
             )}

@@ -12,6 +12,8 @@ import {
 } from '@frontify/fondue';
 import { Marker } from './types';
 
+import css from './style.module.css';
+
 type Props = {
     isLoaded: boolean;
     marker: Marker;
@@ -115,15 +117,18 @@ export const MarkerInput: FC<Props> = ({ marker, updateMarker, isLoaded }) => {
                     }}
                     style={FormControlStyle.Primary}
                 >
-                    <Textarea
-                        id={labelId}
-                        value={label}
-                        autosize={true}
-                        onInput={(newLabel) => {
-                            setLabel(newLabel);
-                            debouncedUpdateMarker({ ...marker, label: newLabel });
-                        }}
-                    />
+                    <div className={css.textareaContainer}>
+                        <Textarea
+                            id={labelId}
+                            value={label}
+                            autosize={true}
+                            minRows={1}
+                            onInput={(newLabel) => {
+                                setLabel(newLabel);
+                                debouncedUpdateMarker({ ...marker, label: newLabel });
+                            }}
+                        />
+                    </div>
                 </FormControl>
             </Stack>
         </div>
